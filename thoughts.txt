@@ -1,0 +1,6 @@
+center of projection must always be at origin to make things easy. Then put camera vector space at 1 unit in the w direction away from origin, and put 4d shape with the closest point to the origin in the w-direction lying on the vector space.
+
+Now, the projection of any point (a, b, c, d) from the shape onto the space is (a/d, b/c, c/d, 1)
+d must always be >= 1
+
+one big cube taking up most of space on right, bar div on left retractable with x
