@@ -9,7 +9,7 @@ $(document).ready(function() {
     Graph.init(graph_options, matrix_rotate_distance, camera_coordinates, camera_args, min_zoom, max_zoom);
 
     $("#menu-icon").click(function() {
-        console.log($("#settings").css("display"));
+        console.log("menu icon was clicked");
         if ($("#settings").css("display") == "none") {
             $("#settings").css("display", "block");
         }
@@ -17,4 +17,12 @@ $(document).ready(function() {
             $("#settings").css("display", "none");
         }
     });
+
+    window.onresize = function() {
+        console.log("window.onresize fired");
+        Graph.fitNewSize();
+    };
+
+    Graph.startRender();
+    // testRender();
 });

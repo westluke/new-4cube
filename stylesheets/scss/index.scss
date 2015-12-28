@@ -4,6 +4,13 @@ html, body {
 	height: 100%;
 	width: 100%;
 	background-color: #B6BDBF;
+	// border: none;
+}
+
+*{
+	margin: 0px;
+	padding: 0px;
+	border: none;
 }
 
 #settings {
@@ -22,4 +29,17 @@ html, body {
 	width: 30px;
 	height: auto;
 	z-index: 9999;
+}
+
+#graph-container {
+	z-index: -99999;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+
+canvas {
+	height: 100%;
+	width: 100%;
+	// overflow: hidden;
 }

@@ -1,71 +1,38 @@
 var Graph = new Object();
 
-// Why store them this way? The way they will actually be stored is as pairs of points. Lets hardcode them that way, and take out a giant chunk of overhead.
-POINTS =
-[[0, 0, 0, 0],
-[0, 0, 0, 1],
-[0, 0, 1, 1],
-[0, 0, 1, 0],
-[0, 1, 1, 0],
-[0, 1, 0, 0],
-[0, 1, 0, 1],
-[0, 1, 1, 1],
-[1, 1, 1, 1],
-[1, 0, 1, 1],
-[1, 0, 0, 1],
-[1, 0, 0, 0],
-[1, 0, 1, 0],
-[1, 1, 1, 0],
-[1, 1, 0, 0],
-[1, 1, 0, 1]];
-
-var connections =
-[[0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-[0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-[0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-[0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
-[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-
-function getLines(points, conns){
-    // Converts a collections of points and a matrix of connections into a set of THREE.js 4d vectors
-
-    var p_a, p_b, ret_line = [];
-
-    for (var a = 0; a < points.length; a++){
-        for (var b = 0; b < points.length; b++){
-            if (conns[a][b] > 0.1){
-                p_a = points[a].slice(0);
-                p_b = points[b].slice(0);
-                var v1 = new THREE.Vector4(p_a[0], p_a[1], p_a[2], p_a[3]);
-                var v2 = new THREE.Vector4(p_b[0], p_b[1], p_b[2], p_b[3]);
-                v1.round();
-                v2.round();
-                ret_line.push([v1, v2])
-            }
-        }
-    }
-    return ret_line;
-}
-var things = getLines(POINTS, connections);
-for (thing in things){
-    console.log(things[thing][0].toArray().toString() + "_____" + things[thing][1].toArray().toString());
-}
-console.log(getLines(POINTS, connections));
-// try to just update underlying points/, not make all the extrusions again.
-
-// function init(a=3){};
-// Graph.init = function(b, a = 2){};
+var lines = [
+[ [0,0,0,0], [0,0,0,1] ],
+[ [0,0,0,0], [0,0,1,0] ],
+[ [0,0,0,0], [0,1,0,0] ],
+[ [0,0,0,0], [1,0,0,0] ],
+[ [0,0,0,1], [0,0,1,1] ],
+[ [0,0,0,1], [0,1,0,1] ],
+[ [0,0,0,1], [1,0,0,1] ],
+[ [0,0,1,1], [0,0,1,0] ],
+[ [0,0,1,1], [0,1,1,1] ],
+[ [0,0,1,1], [1,0,1,1] ],
+[ [0,0,1,0], [0,1,1,0] ],
+[ [0,0,1,0], [1,0,1,0] ],
+[ [0,1,1,0], [0,1,0,0] ],
+[ [0,1,1,0], [0,1,1,1] ],
+[ [0,1,1,0], [1,1,1,0] ],
+[ [0,1,0,0], [0,1,0,1] ],
+[ [0,1,0,0], [1,1,0,0] ],
+[ [0,1,0,1], [0,1,1,1] ],
+[ [0,1,0,1], [1,1,0,1] ],
+[ [0,1,1,1], [1,1,1,1] ],
+[ [1,1,1,1], [1,0,1,1] ],
+[ [1,1,1,1], [1,1,1,0] ],
+[ [1,1,1,1], [1,1,0,1] ],
+[ [1,0,1,1], [1,0,0,1] ],
+[ [1,0,1,1], [1,0,1,0] ],
+[ [1,0,0,1], [1,0,0,0] ],
+[ [1,0,0,1], [1,1,0,1] ],
+[ [1,0,0,0], [1,0,1,0] ],
+[ [1,0,0,0], [1,1,0,0] ],
+[ [1,0,1,0], [1,1,1,0] ],
+[ [1,1,1,0], [1,1,0,0] ],
+[ [1,1,0,0], [1,1,0,1] ] ];
 
 Graph.init = function(  options,
                         matrix_rotate_distance,
@@ -90,6 +57,7 @@ Graph.init = function(  options,
     this.renderer = new THREE.WebGLRenderer({alpha: true});
     this.renderer.setPixelRatio( window.devicePixelRatio );
     document.getElementById('graph-container').appendChild(this.renderer.domElement);
+    this.fitNewSize();
 
     this.controls = new THREE.TrackballControls(this.camera, this.renderer.domElement);
 	this.controls.minDistance = min_zoom;
@@ -98,6 +66,62 @@ Graph.init = function(  options,
     this.controls.noPan = true;
 
     this.light = new THREE.PointLight(0xffffff);
-	this.light.position.copy(this.camera.position);
 	this.scene.add(this.light);
+
+    var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var cube = new THREE.Mesh( geometry, material );
+    this.scene.add( cube );
+}
+
+/*
+When the size of the graph's containers change in any way, the graph
+must change to fit properly.
+Usually will happen when window is resized.
+*/
+Graph.fitNewSize = function() {
+    Graph.renderer.setSize(window.innerWidth, window.innerHeight);
+
+    Graph.camera.aspect = window.innerWidth / window.innerHeight;
+    Graph.camera.updateProjectionMatrix();
+}
+
+/*
+A loop that continually draws and renders the image.
+Can't have any uses of "this" because it will not be used in the context of Graph
+when called in requestAnimationFrame.
+
+Should be independent of the changing of the graph, this is just the drawing of it.
+*/
+Graph.renderLoop = function() {
+    if (Graph.stop_render == false){
+        requestAnimationFrame(Graph.renderLoop);
+        Graph.render();
+        console.log("rendering");
+    }
+}
+
+/*
+Stop the renderLoop.
+*/
+Graph.stopRender = function() {
+    this.stop_render = true;
+}
+
+/*
+Start the renderLoop.
+*/
+Graph.startRender = function() {
+    this.stop_render = false;
+    this.renderLoop();
+}
+
+/*
+Contains everything that should happen in one single drawing of the image.
+The image is updated, the controls are updated, and the light is moved to the correct position.
+*/
+Graph.render = function() {
+    this.controls.update();
+    this.light.position.copy(this.camera.position);
+    this.renderer.render(this.scene, this.camera);
 }

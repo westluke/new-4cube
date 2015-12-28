@@ -18,3 +18,11 @@ options: class syntax style
 
 favor object style, only one object needed, class with static methods unnecessary.
 figure out a way around dumb matrices
+
+remember the issue you had with the trackball controls zoom. Don't let that happen again.
+
+controls need to be updated all the time
+
+when  a function is passed into requestAnimationFrame, it will not be called from the context of the class it belongs to.
+It will be called as its own function, and will therefore not have normal access to the objects properties.
+It's "this" becomes the global object, the window.
