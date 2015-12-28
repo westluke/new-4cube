@@ -1,8 +1,30 @@
 <!DOCTYPE html>
+<!--Don't use sidr, slow, don't want to push away rest of screen. Don't use any animations, just make settings bar appear. Button to hide / show shouldn't move.-->
+<!--Don't cover box though. How should it be done? Can instantly push box to right, update animations with javascript. No, just cover box if necessary.
+Start box not taking up all of screen, so doesn't actually cover.-->
+<!--Need re-render function to draw again with updated parameters.-->
 
 <html>
 	<head>
+		<link rel="stylesheet" href="stylesheets/css/sidr/jquery.sidr.dark.css">
+		<link rel="stylesheet" href="stylesheets/css/index.css">
+		<script src="scripts/jquery-1.11.3.min.js"></script>
+		<script src="scripts/mrdoob-three.js-1f968fe/build/three.min.js"></script>
+		<script src="scripts/TrackballControls.js"></script>
+
+		<script src="scripts/custom/Matrix.js"></script>
+		<script src="scripts/custom/Graph.js"></script>
+		<script src="scripts/custom/onload.js"></script>
 	</head>
 	<body>
+		<div id="settings">
+		</div>
+
+		<a>
+			<img src="assets/settings.png" id="menu-icon"></img>
+		</a>
+
+		<div id="graph-container">
+		</div>
 	</body>
 </html>

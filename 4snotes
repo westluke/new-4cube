@@ -1,0 +1,55 @@
+Pages (#)
+First thing that happens is render class gets initialized
+Try MVC
+Make class to render cube, static
+	stores points (access point)
+	stores transform matrices
+	Stores loop function for animation
+	stores static rotation functions for manual rotations
+	stores loop variables
+	Little access to C or M
+
+C = interface between buttons and rendering class
+Updates static variables there
+mouseover events, click events, reload / back events
+How to capture?
+
+View:
+controls what divs, elements get written to html at what times
+Also updated by C
+
+smarter browser recognition
+Pages should not be restricted to screen size (unless big enough)
+smart changes for mobile
+Figure out layout better, look at other examples
+mobile should probably have menu expanding from side, permanent fixed menu button in corner
+
+use SASS again?
+php stuff? better hosting?
+
+use javascript setInterval and then interrupt when necessary
+fine if it extends below window, but should do nicely.
+Only two media queries, normal size and then mobile when smaller. Normal size should scale pretty well.
+Make sure that the javascript loads properly, and if it doesn't then it displays the error message.
+Loading message for when not all content has yet been loaded, maybe only after a slight delay, blank color background otherwise.
+also definitely use $(document).ready(function{})
+angular?
+node? avoid using php for cookies and database
+express.js for cookies?
+
+YES WEAK PERSPECTIVE PROJECTION:
+only need one projection from 4d to 3d, that's the projection of the 4d shape onto the normal 3d space with the normal three unit vectors. That space never changes.
+to apply perspective, scale down distance from origin of all points based on their distance from the points in the 3d shape, maybe multiply by 1/(1 + d)
+
+
+how human eye works: doesn't matter what angle light comes in at, if it came from the same point, it ends up in the same point in the retina, assuming all points are equal distance from plane of lense.
+if image formed on retina is projection form outside, then focal point of projection is actually inside head a small distance, but that is how it works. Things farther away would be scaled closer to center of retina. How?
+
+described in wikipedia, now just need to find good position for camera space, find maximum extent of points, then put space slightly beyond that, center of projection beyond that
+
+or move 4cube, then jorigin is center of projectionl
+wcaling effect will be based on w-distance from center of projection
+have to multiply again by distance of image space from center of projection to get projected distances
+
+
+okay really, how is the oop gonna work

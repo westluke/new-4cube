@@ -4,3 +4,17 @@ Now, the projection of any point (a, b, c, d) from the shape onto the space is (
 d must always be >= 1
 
 one big cube taking up most of space on right, bar div on left retractable with x
+
+what kinds of classes / functions do I need?
+
+Graph class for entire graph, keep all graph data contained, manipulate from outside only with functions, static
+helper matrix functions in Matrix class (don't use libraries, unnecessary length), also static
+settings functions? can stay in settings functions object, nicely contained, easy access with string names (Settings class?)
+How do we do the point movements? can it be done better than last time? experiment.
+
+options: class syntax style
+        object / prototype syntax style
+        constructor syntax style
+
+favor object style, only one object needed, class with static methods unnecessary.
+figure out a way around dumb matrices

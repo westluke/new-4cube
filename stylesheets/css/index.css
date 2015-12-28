@@ -1,0 +1,24 @@
+html, body {
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+  width: 100%;
+  background-color: #B6BDBF; }
+
+#settings {
+  display: block;
+  position: fixed;
+  left: 0px;
+  height: 100%;
+  background-color: #2B3133;
+  width: 200px; }
+
+#menu-icon {
+  position: fixed;
+  left: 15px;
+  top: 15px;
+  width: 30px;
+  height: auto;
+  z-index: 9999; }
+
+/*# sourceMappingURL=index.css.map */
