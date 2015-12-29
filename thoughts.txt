@@ -35,3 +35,20 @@ With 4d transformation matrix A, I want A * (actual position) or A * (position_v
 OR
 A * position_v + A * vertex_v
 which I can do by just using the normal mesh.geometry.applyMatrix, and then mesh.position.applyMatrix4
+
+When a vector is used to build a geometry, changing the vector WILL NOT change the geometry.
+
+You cannot pass in an empty geometry to a mesh.
+
+TO FREE UP MEMORY: set the value of a var variable to null, and allow the current function to end.
+The variable will become eligible for garbage collection, and even without that it will take up only a tiny amount of space.
+
+NEW VECTOR SYSTEM:
+We have lines, points, perspective_lines, and perspective_points.
+every vector in lines is really an alias to a vector in points, saving memory.
+Same with the perspective versions.
+
+When a new transformation is applied, it is applied ONLY to the vectors in points.
+The points are then passed through the perspectify function, which copies the data into the perspective_points function.
+This will also, of course, update the perspective_lines array.
+At this point, the perspective_lines can be used to build new geometries and update the meshes.

@@ -17,26 +17,32 @@ Oh. I would have had to do that anyways, because I'm transforming 4d vectors, no
 Perspectify: pretend that the point with the lowest w-value is actually at w=1, with the rest of the shape moved
 				accordingly. Now, for every point, divide the x, y, and z-values by the point's w-value
 
-*/
+should I store vector_lines AND vector_points? I think so.
+perspective lines and points are NEVER stored. There is no point in storing them, because we only transform the others.
 
-// These will be used to generate the spheres that mark off the ends of the lines, to make smooth curves.
-Graph.points =
-[[0, 0, 0, 0],
-[0, 0, 0, 1],
-[0, 0, 1, 1],
-[0, 0, 1, 0],
-[0, 1, 1, 0],
-[0, 1, 0, 0],
-[0, 1, 0, 1],
-[0, 1, 1, 1],
-[1, 1, 1, 1],
-[1, 0, 1, 1],
-[1, 0, 0, 1],
-[1, 0, 0, 0],
-[1, 0, 1, 0],
-[1, 1, 1, 0],
-[1, 1, 0, 0],
-[1, 1, 0, 1]];
+
+NEW STRUCTURE:
+the only thing we change is the points lists.
+The lines lists actually only contain references to the vectors in the points lists, so we only need to change those.
+This means that we need to build the points lists, then use a connections matrix to build the lines lists.
+
+THEN we copy the vectors into a perspective points list, and reference those in a perspective lines list.
+
+ORDER OF IMPLEMENTATION:
+get connections array
+make the function to build the vector_lines based off the vector_points
+test that transforming the vector_points transforms the vector_lines
+
+how should plot work now?
+make a new function that does the geometry creation, so it can be used in animate
+
+Also, for efficiency,  extrusion geometries should only ever use LambertMaterials
+and sphere geometries should only ever use PhongMaterials. Need to recognize which is which in animate().
+
+function takes in vector_lines array, produces aliased vector_points arrays
+also goes through original array, and if any vectors are the same, those are aliased to each other.
+
+*/
 
 // The Plot function will only be an initial thing. It will then store an array of geometries that can
 // be transformed in the animate stage, without generating new materials.
@@ -51,7 +57,7 @@ Graph.points =
 // Therefore, the above transformation needs to occur every rendering, at least.
 
 // These should immediately be converted into a similar array of vector pairs.
-Graph.lines = [
+Graph.array_lines = [
 [ [0,0,0,0], [0,0,0,1] ],
 [ [0,0,0,0], [0,0,1,0] ],
 [ [0,0,0,0], [0,1,0,0] ],
@@ -105,12 +111,92 @@ Graph.arrayToVectors = function(lines) {
 }
 
 /*
-Should return a new array of vector lines (only 3d) where the fourth dimension is used
-to scale down the (x, y, z) coordinates of vectors towards the origin to generate 4d perspective.
+Takes in an array of vector lines.
+It then constructs an array of vector points of all the points present in vector_lines.
+It does not create new vectors, it aliases those in vector_lines.
+If 2 vectors in vector_lines are equal, they are aliased together as well.
 */
-Graph.perspectify = function (vector_lines, center_of_projection, camera_space_w_coordinate){
+Graph.aliasVectorLinesToPoints = function(vector_lines){
+	// WORKS
 
+	var vector_points = [];
+	var v1_found;
+	var v2_found;
+
+	for (index in vector_lines){
+		var v1 = vector_lines[index][0];
+		var v2 = vector_lines[index][1];
+		v1_found = false;
+		v2_found = false;
+
+		for (index2 in vector_points){
+			if (vector_points[index2].equals(v1)){
+				vector_lines[index][0] = vector_points[index2];
+				v1_found = true;
+			}
+
+			if (vector_points[index2].equals(v2)){
+				vector_lines[index][1] = vector_points[index2];
+				v2_found = true;
+			}
+		}
+		if (!v1_found){
+			vector_points.push(v1);
+		}
+
+		if (!v2_found){
+			vector_points.push(v2);
+		}
+	}
+	return vector_points;
 }
+
+// Graph.cloneVectorPoints = function (vector_points){
+// 	var new_vector_points = [];
+//
+// 	for (index in vector_points){
+// 		new_vector
+// 	}
+// }
+
+// /*
+// Should return a new array of vector lines (only 3d) where the fourth dimension is used
+// to scale down the (x, y, z) coordinates of vectors towards the origin to generate 4d perspective.
+// */
+// Graph.perspectify = function (vector_lines, center_of_projection, camera_space_w_coordinate){
+// 	var min_w = vector_lines[0][0].w;
+// 	var v1_w = 0;
+// 	var v2_w = 0;
+// 	var new_vector_lines = [];
+//
+// 	for (index in vector_lines){
+// 		v1_w = vector_lines[index][0].w;
+// 		v2_w = vector_lines[index][1].w;
+// 		if (v1_w < min_w){
+// 			min_w = v1_w;
+// 		}
+// 		if (v2_w < min_w){
+// 			min_w = v2_w;
+// 		}
+// 	}
+//
+// 	var w_move = 1 - min_w;
+//
+// 	for (index in vector_lines){
+// 		var v1 = new THREE.Vector4(0, 0, 0, 0);
+// 		var v2 = new THREE.Vector4(0, 0, 0, 0);
+// 		v1.copy(vector_lines[index][0]);
+// 		v2.copy(vector_lines[index][1]);
+// 		v1.x /= (v1.w + w_move);
+// 		v1.y /= (v1.w + w_move);
+// 		v1.z /= (v1.w + w_move);
+// 		v2.x /= (v1.w + w_move);
+// 		v2.y /= (v1.w + w_move);
+// 		v2.z /= (v1.w + w_move);
+// 		new_vector_lines.push([v1, v2]);
+// 	}
+// 	return new_vector_lines;
+// }
 
 Graph.init = function(  options,				// parameters for the display of the graph
                         matrix_rotate_distance,	// rotation distance for the base rotation matrices
@@ -118,7 +204,9 @@ Graph.init = function(  options,				// parameters for the display of the graph
                         camera_args,			// fov, aspect ratio, near and far fields
                         min_zoom, max_zoom){	// how far the camera can zoom.
 
-	this.vector_lines = this.arrayToVectors(this.lines);
+	this.lines = this.arrayToVectors(this.array_lines);
+	this.points = this.aliasVectorLinesToPoints(this.lines);
+	this.perspective
 	// console.log(this.lines);
 
     this.matrix_rotate_distance = matrix_rotate_distance;
@@ -159,12 +247,6 @@ Graph.init = function(  options,				// parameters for the display of the graph
 	// For shading
     this.light = new THREE.PointLight(0xffffff);
 	this.scene.add(this.light);
-
-    // var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    // var material = new THREE.MeshLambertMaterial( { color: this.options.color } );
-    // this.cube = new THREE.Mesh( geometry, material );
-    // this.cube.verticesNeedUpdate = true;
-    // this.scene.add( this.cube );
 }
 
 /*
@@ -186,6 +268,10 @@ when called in requestAnimationFrame.
 Should be independent of the changing of the graph, this is just the drawing of it.
 */
 Graph.renderLoop = function() {
+	if (Graph.stop_animate == false){
+		Graph.animate();
+	}
+
     if (Graph.stop_render == false){
         requestAnimationFrame(Graph.renderLoop);
         Graph.render();
@@ -217,96 +303,106 @@ Graph.render = function() {
     this.renderer.render(this.scene, this.camera);
 }
 
-Graph.animateLoop = function() {
-    if (Graph.stop_animate == false){
-        Graph.animate();
-        setTimeout(Graph.animateLoop, 20);
-    }
-}
-
 Graph.stopAnimate = function() {
     this.stop_animate = true;
 }
 
 Graph.startAnimate = function() {
     this.stop_animate = false;
-    this.animateLoop();
 }
 
 Graph.animate = function() {
-	for (index in this.meshes){
-		this.meshes[index].geometry.applyMatrix(Graph.rotations.xy);
-		this.meshes[index].position.copy(this.meshes[index].position.applyMatrix4(Graph.rotations.xy));
-	}
+	// for (index in this.meshes){
+	// 	this.meshes[index].geometry.applyMatrix(Graph.rotations.xy);
+	// 	this.meshes[index].position.copy(this.meshes[index].position.applyMatrix4(Graph.rotations.xy));
+	// }
 }
 
 /*
 Add the lines described in vector_lines to the graph, and store them for future transformations.
-options is of the form {color: ?, segments: ?, }
+options is of the form {color: ?, shape_segments: ?, sphere_segments: ?, radius: ?}
 */
 Graph.plot = function(vector_lines, options){
-	// var circle_geometry = new THREE.CircleGeometry(1, 8);
-	// var shape_points = circle_geometry.vertices.slice(1, 9);
-	// var shape = new THREE.Shape(shape_points);
-	// var curve = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(2, 2, 2));
+
+
+
+// CENTER FIRST
+
+
+
+	// var vector_lines = this.perspectify(vector_lines, 0, 0);
+	// console.log(vector_lines);
 	//
-	// var geo = new THREE.ExtrudeGeometry(shape, {extrudePath: curve});
-	// console.log(geo);
-	// geo.verticesNeedUpdate = true;
-	// var mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial());
-	// mesh.frustumCulled = false;
-
-	// This ungodly beast is pretty much the equivalent of the commented code above.
-	// It's here to avoid assigning any variables to anything, because I've had memory leak issues.
-	var mesh = new THREE.Mesh(
-		new THREE.ExtrudeGeometry(
-			new THREE.Shape(
-				(new THREE.CircleGeometry(1, options.segments)).vertices.slice(1, 9)
-			),
-			{extrudePath: new THREE.LineCurve3(new THREE.Vector3(5, 5, 5), new THREE.Vector3(0, 0, 0))}
-		),
-		new THREE.MeshLambertMaterial({color: 0xED5749})
-	);
-	mesh.geometry.verticesNeedUpdate = true;
-	mesh.frustumCulled = false;
-
-	// for (index in lines){
+	// for (index in vector_lines){
+	// 	// This ungodly mess is to avoid memory leaks at all costs.
 	// 	var mesh = new THREE.Mesh(
 	// 		new THREE.ExtrudeGeometry(
 	// 			new THREE.Shape(
-	// 				(new THREE.CircleGeometry(1, options.segments)).vertices.slice(1, options.segments + 1)
+	// 				(new THREE.CircleGeometry(options.radius, options.shape_segments)).vertices.slice(1, options.shape_segments + 1)
 	// 			),
-	// 			{extrudePath: new THREE.LineCurve3(new THREE.Vector3(5, 5, 5), new THREE.Vector3(0, 0, 0))}
+	// 			{extrudePath: new THREE.LineCurve3(vector_lines[index][0], vector_lines[index][1])}
 	// 		),
-	// 		new THREE.MeshLambertMaterial({color: 0xED5749})
+	// 		new THREE.MeshLambertMaterial({color: options.color})
 	// 	);
+	// 	mesh.geometry.verticesNeedUpdate = true;
+	// 	mesh.frustumCulled = false;
+	//
+	// 	var sphere_mesh1 = new THREE.Mesh(
+	// 		new THREE.SphereGeometry(options.radius, 10),
+	// 		new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading})
+	// 	)
+	// 	sphere_mesh1.position.set(vector_lines[index][0].x, vector_lines[index][0].y, vector_lines[index][0].z)
+	// 	sphere_mesh1.geometry.verticesNeedUpdate = true;
+	// 	sphere_mesh1.frustumCulled = false;
+	//
+	// 	var sphere_mesh2 = new THREE.Mesh(
+	// 		new THREE.SphereGeometry(options.radius, 10),
+	// 		new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading})
+	// 	)
+	// 	sphere_mesh2.position.set(vector_lines[index][0].x, vector_lines[index][0].y, vector_lines[index][0].z)
+	// 	sphere_mesh2.geometry.verticesNeedUpdate = true;
+	// 	sphere_mesh2.frustumCulled = false;
+
+	// 	this.scene.add(mesh);
+	// 	this.scene.add(sphere_mesh1);
+	// 	this.scene.add(sphere_mesh2);
+	// 	this.meshes.push(mesh);
+	// 	this.meshes.push(sphere_mesh1);
+	// 	this.meshes.push(sphere_mesh2);
 	// }
 
-	// var sphere_mesh = new THREE.Mesh(
-	// 	new THREE.SphereGeometry(1, 32, 32),
-	// 	new THREE.MeshBasicMaterial({color: 0xED5749})
-	// )
-	//
-	// var sphere_mesh2 = new THREE.Mesh(
-	// 	new THREE.SphereGeometry(1, 32, 32),
-	// 	new THREE.MeshBasicMaterial({color: 0xED5749})
-	// )
-	//
-	// sphere_mesh.geometry.verticesNeedUpdate = true;
-	// sphere_mesh2.geometry.verticesNeedUpdate = true;
-	//
-	// sphere_mesh.position.set(0, 0, 0);
-	// sphere_mesh2.position.set(5, 5, 5);
 
-	var geometry = new THREE.SphereGeometry(1, 10);
-	var material = new THREE.MeshPhongMaterial({shading: THREE.FlatShading});
-	var cube = new THREE.Mesh(geometry, material);
-	this.scene.add(cube);
 
+
+
+	// var v1 = new THREE.Vector3(0, 0, 0);
+	// var v2 = v1;
+	// v2.set(20, 20, 20);
+	//
+	// var mesh = new THREE.Mesh(
+	// 	new THREE.ExtrudeGeometry(
+	// 		new THREE.Shape(
+	// 			(new THREE.CircleGeometry(1, 8)).vertices.slice(1, 9)
+	// 		),
+	// 		{extrudePath: new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1))}
+	// 	),
+	// 	new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading})
+	// );
+	// mesh.geometry.verticesNeedUpdate = true;
+	// mesh.frustumCulled = false;
+	//
+	// // v1.set(20, 20, 20)
+	//
+
+	// var mesh = new THREE.Mesh(
+	// 	new THREE.SphereGeometry(options.radius, 10),
+	// 	new THREE.MeshLambertMaterial({color: options.color, shading: THREE.FlatShading})
+	// )
 	// this.scene.add(mesh);
-	// this.scene.add(sphere_mesh2);
-	// this.scene.add(sphere_mesh);
-	// this.meshes.push(mesh);
-	// this.meshes.push(sphere_mesh2);
-	// this.meshes.push(sphere_mesh);
+
+	// var mesh = new THREE.Mesh(
+	// 	new THREE.ExtrudeGeometry(),
+	// 	new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading}));
+	// mesh.frustumCulled = false;
+	// this.scene.add(mesh);
 }

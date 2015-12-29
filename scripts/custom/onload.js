@@ -35,7 +35,12 @@ $(document).ready(function() {
 		}
 	});
 
-	Graph.plot(3, {segments: 5});
-    Graph.startRender();
-    Graph.startAnimate();
+	// console.log(Graph.vector_lines);
+	// Graph.vector_points = Graph.aliasVectorLinesToPoints(Graph.vector_lines);
+	// console.log(Graph.vector_points);
+	// Graph.vector_lines[0][0].set(20, 20, 20, 20);
+	// console.log(Graph.vector_lines);
+	// Graph.plot(Graph.vector_lines, {color: 0xED5749, shape_segments: 10, sphere_segments: 10, radius: 0.1});
+    // Graph.startRender();
+    // Graph.startAnimate();
 });
