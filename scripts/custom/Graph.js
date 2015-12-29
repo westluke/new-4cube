@@ -1,9 +1,38 @@
 var Graph = new Object();
 
+// These will be used to generate the spheres that mark off the ends of the lines, to make smooth curves.
+Graph.points =
+[[0, 0, 0, 0],
+[0, 0, 0, 1],
+[0, 0, 1, 1],
+[0, 0, 1, 0],
+[0, 1, 1, 0],
+[0, 1, 0, 0],
+[0, 1, 0, 1],
+[0, 1, 1, 1],
+[1, 1, 1, 1],
+[1, 0, 1, 1],
+[1, 0, 0, 1],
+[1, 0, 0, 0],
+[1, 0, 1, 0],
+[1, 1, 1, 0],
+[1, 1, 0, 0],
+[1, 1, 0, 1]];
+
+// The Plot function will only be an initial thing. It will then store an array of geometries that can
+// be transformed in the animate stage, without generating new materials.
+
 // The initial collection of lines to graph.
 // Pairs lists of coordinates for the points in 4d space.
 // Hardcoded to save work.
-var lines = [
+
+// These need to be passed in to a function that can apply the perspective projection transformation
+// The results will be passed into a plotting function
+// All other transformations operate on the original set of points, NOT the perspectified set.
+// Therefore, the above transformation needs to occur every rendering, at least.
+
+// These should immediately be converted into a similar array of vector pairs.
+Graph.lines = [
 [ [0,0,0,0], [0,0,0,1] ],
 [ [0,0,0,0], [0,0,1,0] ],
 [ [0,0,0,0], [0,1,0,0] ],
@@ -37,11 +66,41 @@ var lines = [
 [ [1,1,1,0], [1,1,0,0] ],
 [ [1,1,0,0], [1,1,0,1] ] ];
 
+Graph.meshes = [];
+
+/*
+Converts an array of lines in array format, like the one above, into an array of lines in vector format.
+*/
+Graph.arrayToVectors = function(lines) {
+	var vector_array = [];
+
+	for (index in lines){
+		var vector1 = new THREE.Vector4(0, 0, 0, 0);
+		var vector2 = new THREE.Vector4(0, 0, 0, 0);
+		vector1.fromArray(lines[index][0]);
+		vector2.fromArray(lines[index][1]);
+		vector_array.push([vector1, vector2]);
+	}
+
+	return vector_array;
+}
+
+/*
+Should return a new array of vector lines (only 3d) where the fourth dimension is used
+to scale down the (x, y, z) coordinates of vectors towards the origin to generate 4d perspective.
+*/
+Graph.perspectify = function (vector_lines, center_of_projection, camera_space_w_coordinate){
+
+}
+
 Graph.init = function(  options,				// parameters for the display of the graph
                         matrix_rotate_distance,	// rotation distance for the base rotation matrices
                         camera_coordinates,		// where the camera starts in the scene
                         camera_args,			// fov, aspect ratio, near and far fields
                         min_zoom, max_zoom){	// how far the camera can zoom.
+
+	this.vector_lines = this.arrayToVectors(this.lines);
+	// console.log(this.lines);
 
     this.matrix_rotate_distance = matrix_rotate_distance;
     this.options = options;
@@ -82,11 +141,11 @@ Graph.init = function(  options,				// parameters for the display of the graph
     this.light = new THREE.PointLight(0xffffff);
 	this.scene.add(this.light);
 
-    var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    var material = new THREE.MeshLambertMaterial( { color: this.options.color } );
-    this.cube = new THREE.Mesh( geometry, material );
-    this.cube.verticesNeedUpdate = true;
-    this.scene.add( this.cube );
+    // var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    // var material = new THREE.MeshLambertMaterial( { color: this.options.color } );
+    // this.cube = new THREE.Mesh( geometry, material );
+    // this.cube.verticesNeedUpdate = true;
+    // this.scene.add( this.cube );
 }
 
 /*
@@ -156,8 +215,10 @@ Graph.startAnimate = function() {
 }
 
 Graph.animate = function() {
-    Graph.cube.geometry.applyMatrix(Graph.rotations.xy);
-    Graph.cube.updateMatrix();
+	for (index in this.meshes){
+		this.meshes[index].geometry.applyMatrix(Graph.rotations.xy);
+		this.meshes[index].updateMatrix();
+	}
 
     // I'm not sure this stuff is actually needed, but it was recommended.
     // Graph.cube.matrix.identity();
@@ -165,4 +226,26 @@ Graph.animate = function() {
     // Graph.cube.position.set( 0, 0, 0 );
     // Graph.cube.rotation.set( 0, 0, 0 );
     // Graph.cube.scale.set( 1, 1, 1 );
+}
+
+Graph.plot = function(lines){
+	var circle_geometry = new THREE.CircleGeometry(1, 8);
+	var shape_points = circle_geometry.vertices.slice(1, 9);
+	var shape = new THREE.Shape(shape_points);
+	var curve = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(2, 2, 2));
+
+	var extrude_settings = {
+		steps			: 1,
+        bevelEnabled	: false,
+        extrudePath		: curve
+	};
+
+	var geo = new THREE.ExtrudeGeometry(shape, extrude_settings);
+	console.log(geo);
+	geo.verticesNeedUpdate = true;
+	var mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial());
+	mesh.frustumCulled = false;
+
+	this.scene.add(mesh);
+	this.meshes.push(mesh);
 }
