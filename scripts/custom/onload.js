@@ -41,6 +41,7 @@ $(document).ready(function() {
 	// Graph.vector_lines[0][0].set(20, 20, 20, 20);
 	// console.log(Graph.vector_lines);
 	// Graph.plot(Graph.vector_lines, {color: 0xED5749, shape_segments: 10, sphere_segments: 10, radius: 0.1});
-    // Graph.startRender();
-    // Graph.startAnimate();
+    Graph.startRender();
+    Graph.startAnimate();
+	Graph.plot(Graph.perspective_lines, Graph.perspective_points, {color: 0xED5749, shape_segments: 40, sphere_segments: 15, radius: 0.05});
 });

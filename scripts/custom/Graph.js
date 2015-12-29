@@ -95,6 +95,7 @@ Graph.meshes = [];
 
 /*
 Converts an array of lines in array format, like the one above, into an array of lines in vector format.
+CREATES vectors, doesn't ALIAS them.
 */
 Graph.arrayToVectors = function(lines) {
 	var vector_array = [];
@@ -108,6 +109,12 @@ Graph.arrayToVectors = function(lines) {
 	}
 
 	return vector_array;
+}
+
+Graph.transformVectors = function(points, transformation){
+	for (index in points){
+		points[index].applyMatrix4(transformation);
+	}
 }
 
 /*
@@ -151,52 +158,80 @@ Graph.aliasVectorLinesToPoints = function(vector_lines){
 	return vector_points;
 }
 
-// Graph.cloneVectorPoints = function (vector_points){
-// 	var new_vector_points = [];
-//
-// 	for (index in vector_points){
-// 		new_vector
-// 	}
-// }
+/*
+Should return a new array of vector lines (only 3d) where the fourth dimension is used
+to scale down the (x, y, z) coordinates of vectors towards the origin to generate 4d perspective.
+*/
+Graph.perspectify = function (points, perspective_points){
+	var min_w = points[0].w;
+	var vector_w = 0;
+	var coord_array;
+	var x; var y; var z; var w;
+	var divisor;
 
-// /*
-// Should return a new array of vector lines (only 3d) where the fourth dimension is used
-// to scale down the (x, y, z) coordinates of vectors towards the origin to generate 4d perspective.
-// */
-// Graph.perspectify = function (vector_lines, center_of_projection, camera_space_w_coordinate){
-// 	var min_w = vector_lines[0][0].w;
-// 	var v1_w = 0;
-// 	var v2_w = 0;
-// 	var new_vector_lines = [];
-//
-// 	for (index in vector_lines){
-// 		v1_w = vector_lines[index][0].w;
-// 		v2_w = vector_lines[index][1].w;
-// 		if (v1_w < min_w){
-// 			min_w = v1_w;
-// 		}
-// 		if (v2_w < min_w){
-// 			min_w = v2_w;
-// 		}
-// 	}
-//
-// 	var w_move = 1 - min_w;
-//
-// 	for (index in vector_lines){
-// 		var v1 = new THREE.Vector4(0, 0, 0, 0);
-// 		var v2 = new THREE.Vector4(0, 0, 0, 0);
-// 		v1.copy(vector_lines[index][0]);
-// 		v2.copy(vector_lines[index][1]);
-// 		v1.x /= (v1.w + w_move);
-// 		v1.y /= (v1.w + w_move);
-// 		v1.z /= (v1.w + w_move);
-// 		v2.x /= (v1.w + w_move);
-// 		v2.y /= (v1.w + w_move);
-// 		v2.z /= (v1.w + w_move);
-// 		new_vector_lines.push([v1, v2]);
-// 	}
-// 	return new_vector_lines;
-// }
+	for (index in points){
+		vector_w = points[index].w;
+
+		if (vector_w < min_w){
+			min_w = vector_w;
+		}
+	}
+
+	var w_move = 1 - min_w;
+
+	for (index in points){
+		coord_array = points[index].toArray();
+		x = coord_array[0];
+		y = coord_array[1];
+		z = coord_array[2];
+		w = coord_array[3];
+		divisor = w + w_move;
+		perspective_points[index].set(x/divisor, y/divisor, z/divisor, 1);
+	}
+}
+
+Graph.center = function (points){
+	var x_min = points[0].x;
+	var x_max = x_min;
+	var y_min = points[0].y;
+	var y_max = y_min;
+	var z_min = points[0].z;
+	var z_max = z_min;
+	var w_min = points[0].w;
+	var w_max = w_min;
+
+	var x; var y; var z; var w;
+	var coord_array;
+
+	for (index in points){
+		coord_array = points[index].toArray();
+		x = coord_array[0];
+		y = coord_array[1];
+		z = coord_array[2];
+		w = coord_array[3];
+
+		if (x < x_min){ x_min = x; }
+		if (x > x_max){ x_max = x; }
+		if (y < y_min){ y_min = y; }
+		if (y > y_max){ y_max = y; }
+		if (z < z_min){ z_min = z; }
+		if (z > z_max){ z_max = z; }
+		if (w < w_min){ w_min = w; }
+		if (w > w_max){ w_max = w; }
+	}
+
+	var x_avg = (x_min + x_max) / 2;
+	var y_avg = (y_min + y_max) / 2;
+	var z_avg = (z_min + z_max) / 2;
+	var w_avg = (w_min + w_max) / 2;
+
+	for (index in points){
+		points[index].setX(points[index].x - x_avg);
+		points[index].setY(points[index].y - y_avg);
+		points[index].setZ(points[index].z - z_avg);
+		points[index].setW(points[index].w - w_avg);
+	}
+}
 
 Graph.init = function(  options,				// parameters for the display of the graph
                         matrix_rotate_distance,	// rotation distance for the base rotation matrices
@@ -204,9 +239,20 @@ Graph.init = function(  options,				// parameters for the display of the graph
                         camera_args,			// fov, aspect ratio, near and far fields
                         min_zoom, max_zoom){	// how far the camera can zoom.
 
+	/*
+	Slight problem that must be watched carefully:
+		points and perspective_points must be absolutely parallel.
+		Have to make sure that perspectify is safe, and that it is the only thing that operates
+		on perspective_points.
+	*/
 	this.lines = this.arrayToVectors(this.array_lines);
 	this.points = this.aliasVectorLinesToPoints(this.lines);
-	this.perspective
+	this.center(this.points);
+	console.log(this.points);
+
+	this.perspective_lines = this.arrayToVectors(this.array_lines);
+	this.perspective_points = this.aliasVectorLinesToPoints(this.perspective_lines);
+	this.perspectify(this.points, this.perspective_points);
 	// console.log(this.lines);
 
     this.matrix_rotate_distance = matrix_rotate_distance;
@@ -219,7 +265,8 @@ Graph.init = function(  options,				// parameters for the display of the graph
                         wz: Matrix.rotateWZ_4d(matrix_rotate_distance)}
 
 	// The rotation that the animate() function will use on the graph.
-	this.current_rotation = this.rotations.xw.multiply(this.rotations.wy).multiply(this.rotations.wz);
+	// this.current_rotation = this.rotations.xw.multiply(this.rotations.wy).multiply(this.rotations.wz);
+	this.current_rotation = this.rotations.xw;
 
 	this.stop_render = true;
     this.stop_animate = true;
@@ -311,7 +358,30 @@ Graph.startAnimate = function() {
     this.stop_animate = false;
 }
 
-Graph.animate = function() {
+Graph.animate = function(options) {
+	this.transformVectors(this.points, this.current_rotation);
+	this.perspectify(this.points, this.perspective_points);
+	var points_index = 0;
+	var lines_index = 0;
+
+	for (index in this.meshes){
+		if (this.meshes[index].isASphere){
+			this.meshes[index].position.copy(this.perspective_points[points_index]);
+			points_index++;
+			// console.log("Sphere");
+		} else {
+			this.meshes[index].geometry.dispose();
+			this.meshes[index].geometry = new THREE.ExtrudeGeometry(
+				new THREE.Shape(
+					(new THREE.CircleGeometry(0.05, 20, 20)).vertices.slice(1, 21)
+				),
+				{extrudePath: new THREE.LineCurve3(
+					this.perspective_lines[lines_index][0].clone(),
+					this.perspective_lines[lines_index][1].clone())}
+			);
+			lines_index++;
+		}
+	}
 	// for (index in this.meshes){
 	// 	this.meshes[index].geometry.applyMatrix(Graph.rotations.xy);
 	// 	this.meshes[index].position.copy(this.meshes[index].position.applyMatrix4(Graph.rotations.xy));
@@ -321,88 +391,39 @@ Graph.animate = function() {
 /*
 Add the lines described in vector_lines to the graph, and store them for future transformations.
 options is of the form {color: ?, shape_segments: ?, sphere_segments: ?, radius: ?}
+Just to be careful, plot should be cloning vectors, not aliasing them into the geometries.
 */
-Graph.plot = function(vector_lines, options){
+Graph.plot = function(lines, points, options){
+	for (index in lines){
+		// This ungodly mess is to avoid memory leaks at all costs.
+		var mesh = new THREE.Mesh(
+			new THREE.ExtrudeGeometry(
+				new THREE.Shape(
+					(new THREE.CircleGeometry(options.radius, options.shape_segments)).vertices.slice(1, options.shape_segments + 1)
+				),
+				{extrudePath: new THREE.LineCurve3(lines[index][0].clone(), lines[index][1].clone())}
+			),
+			new THREE.MeshLambertMaterial({color: options.color})
+		);
+		mesh.isASphere = false;
+		mesh.geometry.verticesNeedUpdate = true;
+		mesh.frustumCulled = false;
 
+		this.scene.add(mesh);
+		this.meshes.push(mesh);
+	}
 
+	for (index in points){
+		var sphere_mesh = new THREE.Mesh(
+			new THREE.SphereGeometry(options.radius, options.sphere_segments),
+			new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading})
+		)
+		sphere_mesh.isASphere = true;
+		sphere_mesh.position.set(points[index].x, points[index].y, points[index].z)
+		sphere_mesh.geometry.verticesNeedUpdate = true;
+		sphere_mesh.frustumCulled = false;
 
-// CENTER FIRST
-
-
-
-	// var vector_lines = this.perspectify(vector_lines, 0, 0);
-	// console.log(vector_lines);
-	//
-	// for (index in vector_lines){
-	// 	// This ungodly mess is to avoid memory leaks at all costs.
-	// 	var mesh = new THREE.Mesh(
-	// 		new THREE.ExtrudeGeometry(
-	// 			new THREE.Shape(
-	// 				(new THREE.CircleGeometry(options.radius, options.shape_segments)).vertices.slice(1, options.shape_segments + 1)
-	// 			),
-	// 			{extrudePath: new THREE.LineCurve3(vector_lines[index][0], vector_lines[index][1])}
-	// 		),
-	// 		new THREE.MeshLambertMaterial({color: options.color})
-	// 	);
-	// 	mesh.geometry.verticesNeedUpdate = true;
-	// 	mesh.frustumCulled = false;
-	//
-	// 	var sphere_mesh1 = new THREE.Mesh(
-	// 		new THREE.SphereGeometry(options.radius, 10),
-	// 		new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading})
-	// 	)
-	// 	sphere_mesh1.position.set(vector_lines[index][0].x, vector_lines[index][0].y, vector_lines[index][0].z)
-	// 	sphere_mesh1.geometry.verticesNeedUpdate = true;
-	// 	sphere_mesh1.frustumCulled = false;
-	//
-	// 	var sphere_mesh2 = new THREE.Mesh(
-	// 		new THREE.SphereGeometry(options.radius, 10),
-	// 		new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading})
-	// 	)
-	// 	sphere_mesh2.position.set(vector_lines[index][0].x, vector_lines[index][0].y, vector_lines[index][0].z)
-	// 	sphere_mesh2.geometry.verticesNeedUpdate = true;
-	// 	sphere_mesh2.frustumCulled = false;
-
-	// 	this.scene.add(mesh);
-	// 	this.scene.add(sphere_mesh1);
-	// 	this.scene.add(sphere_mesh2);
-	// 	this.meshes.push(mesh);
-	// 	this.meshes.push(sphere_mesh1);
-	// 	this.meshes.push(sphere_mesh2);
-	// }
-
-
-
-
-
-	// var v1 = new THREE.Vector3(0, 0, 0);
-	// var v2 = v1;
-	// v2.set(20, 20, 20);
-	//
-	// var mesh = new THREE.Mesh(
-	// 	new THREE.ExtrudeGeometry(
-	// 		new THREE.Shape(
-	// 			(new THREE.CircleGeometry(1, 8)).vertices.slice(1, 9)
-	// 		),
-	// 		{extrudePath: new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1))}
-	// 	),
-	// 	new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading})
-	// );
-	// mesh.geometry.verticesNeedUpdate = true;
-	// mesh.frustumCulled = false;
-	//
-	// // v1.set(20, 20, 20)
-	//
-
-	// var mesh = new THREE.Mesh(
-	// 	new THREE.SphereGeometry(options.radius, 10),
-	// 	new THREE.MeshLambertMaterial({color: options.color, shading: THREE.FlatShading})
-	// )
-	// this.scene.add(mesh);
-
-	// var mesh = new THREE.Mesh(
-	// 	new THREE.ExtrudeGeometry(),
-	// 	new THREE.MeshPhongMaterial({color: options.color, shading: THREE.FlatShading}));
-	// mesh.frustumCulled = false;
-	// this.scene.add(mesh);
+		this.scene.add(sphere_mesh);
+		this.meshes.push(sphere_mesh);
+	}
 }
