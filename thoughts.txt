@@ -26,3 +26,12 @@ controls need to be updated all the time
 when  a function is passed into requestAnimationFrame, it will not be called from the context of the class it belongs to.
 It will be called as its own function, and will therefore not have normal access to the objects properties.
 It's "this" becomes the global object, the window.
+
+When you use geometry.applyMatrix(), it doesn't apply the matrix the way you think it would.
+every geometry is actually only stored in positions RELATIVE to their "position", and only that position is actually transformed.
+I have to find a way to transform the actual vertices.
+SOLUTION: Matrix multiplication is distributive, and the actual position of each vertex is (position_v + vertex_v)
+With 4d transformation matrix A, I want A * (actual position) or A * (position_v + vertex_v)
+OR
+A * position_v + A * vertex_v
+which I can do by just using the normal mesh.geometry.applyMatrix, and then mesh.position.applyMatrix4

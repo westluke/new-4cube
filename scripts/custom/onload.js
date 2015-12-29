@@ -1,6 +1,6 @@
 $(document).ready(function() {
     var graph_options = {color: 0xED5749, wireframe: false, radius: 0.04, vertices: 8};
-    var matrix_rotate_distance = 0.001;
+    var matrix_rotate_distance = 0.01;
     var camera_coordinates = [0, 0, 2];
     var camera_args = {fov: 60, aspect_ratio: 1, near: 0.001, far: 40};
     // var camera_args = {fov: 60, aspect_ratio: 1, near: 0.001, far: 400};
@@ -35,7 +35,7 @@ $(document).ready(function() {
 		}
 	});
 
-	Graph.plot();
+	Graph.plot(3, {segments: 5});
     Graph.startRender();
     Graph.startAnimate();
 });

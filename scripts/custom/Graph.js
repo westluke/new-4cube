@@ -1,5 +1,24 @@
 var Graph = new Object();
 
+/*
+During program execution, the real 4d points and lines are kept in vector form
+In the plot stage, the vector_lines and points are perspectified, and the new perspetive points stored in a list
+the vectors in that list are cloned into the proper meshes, and then the perspective list is destroyed completely
+
+shit. The animate stage will have to be very very different
+
+during the animate loop, what happens?
+the actual 4d vectors need to be transformed with the current rotation
+then they need to be perspectified (very quick actually), and passed into the meshes somehow. HOW?
+can I just update their geometries? that was the old approach, and I think it's best. make new geometry each time, delete the old.
+
+Oh. I would have had to do that anyways, because I'm transforming 4d vectors, not 3d.
+
+Perspectify: pretend that the point with the lowest w-value is actually at w=1, with the rest of the shape moved
+				accordingly. Now, for every point, divide the x, y, and z-values by the point's w-value
+
+*/
+
 // These will be used to generate the spheres that mark off the ends of the lines, to make smooth curves.
 Graph.points =
 [[0, 0, 0, 0],
@@ -217,35 +236,77 @@ Graph.startAnimate = function() {
 Graph.animate = function() {
 	for (index in this.meshes){
 		this.meshes[index].geometry.applyMatrix(Graph.rotations.xy);
-		this.meshes[index].updateMatrix();
+		this.meshes[index].position.copy(this.meshes[index].position.applyMatrix4(Graph.rotations.xy));
 	}
-
-    // I'm not sure this stuff is actually needed, but it was recommended.
-    // Graph.cube.matrix.identity();
-    //
-    // Graph.cube.position.set( 0, 0, 0 );
-    // Graph.cube.rotation.set( 0, 0, 0 );
-    // Graph.cube.scale.set( 1, 1, 1 );
 }
 
-Graph.plot = function(lines){
-	var circle_geometry = new THREE.CircleGeometry(1, 8);
-	var shape_points = circle_geometry.vertices.slice(1, 9);
-	var shape = new THREE.Shape(shape_points);
-	var curve = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(2, 2, 2));
+/*
+Add the lines described in vector_lines to the graph, and store them for future transformations.
+options is of the form {color: ?, segments: ?, }
+*/
+Graph.plot = function(vector_lines, options){
+	// var circle_geometry = new THREE.CircleGeometry(1, 8);
+	// var shape_points = circle_geometry.vertices.slice(1, 9);
+	// var shape = new THREE.Shape(shape_points);
+	// var curve = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(2, 2, 2));
+	//
+	// var geo = new THREE.ExtrudeGeometry(shape, {extrudePath: curve});
+	// console.log(geo);
+	// geo.verticesNeedUpdate = true;
+	// var mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial());
+	// mesh.frustumCulled = false;
 
-	var extrude_settings = {
-		steps			: 1,
-        bevelEnabled	: false,
-        extrudePath		: curve
-	};
-
-	var geo = new THREE.ExtrudeGeometry(shape, extrude_settings);
-	console.log(geo);
-	geo.verticesNeedUpdate = true;
-	var mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial());
+	// This ungodly beast is pretty much the equivalent of the commented code above.
+	// It's here to avoid assigning any variables to anything, because I've had memory leak issues.
+	var mesh = new THREE.Mesh(
+		new THREE.ExtrudeGeometry(
+			new THREE.Shape(
+				(new THREE.CircleGeometry(1, options.segments)).vertices.slice(1, 9)
+			),
+			{extrudePath: new THREE.LineCurve3(new THREE.Vector3(5, 5, 5), new THREE.Vector3(0, 0, 0))}
+		),
+		new THREE.MeshLambertMaterial({color: 0xED5749})
+	);
+	mesh.geometry.verticesNeedUpdate = true;
 	mesh.frustumCulled = false;
 
-	this.scene.add(mesh);
-	this.meshes.push(mesh);
+	// for (index in lines){
+	// 	var mesh = new THREE.Mesh(
+	// 		new THREE.ExtrudeGeometry(
+	// 			new THREE.Shape(
+	// 				(new THREE.CircleGeometry(1, options.segments)).vertices.slice(1, options.segments + 1)
+	// 			),
+	// 			{extrudePath: new THREE.LineCurve3(new THREE.Vector3(5, 5, 5), new THREE.Vector3(0, 0, 0))}
+	// 		),
+	// 		new THREE.MeshLambertMaterial({color: 0xED5749})
+	// 	);
+	// }
+
+	// var sphere_mesh = new THREE.Mesh(
+	// 	new THREE.SphereGeometry(1, 32, 32),
+	// 	new THREE.MeshBasicMaterial({color: 0xED5749})
+	// )
+	//
+	// var sphere_mesh2 = new THREE.Mesh(
+	// 	new THREE.SphereGeometry(1, 32, 32),
+	// 	new THREE.MeshBasicMaterial({color: 0xED5749})
+	// )
+	//
+	// sphere_mesh.geometry.verticesNeedUpdate = true;
+	// sphere_mesh2.geometry.verticesNeedUpdate = true;
+	//
+	// sphere_mesh.position.set(0, 0, 0);
+	// sphere_mesh2.position.set(5, 5, 5);
+
+	var geometry = new THREE.SphereGeometry(1, 10);
+	var material = new THREE.MeshPhongMaterial({shading: THREE.FlatShading});
+	var cube = new THREE.Mesh(geometry, material);
+	this.scene.add(cube);
+
+	// this.scene.add(mesh);
+	// this.scene.add(sphere_mesh2);
+	// this.scene.add(sphere_mesh);
+	// this.meshes.push(mesh);
+	// this.meshes.push(sphere_mesh2);
+	// this.meshes.push(sphere_mesh);
 }
