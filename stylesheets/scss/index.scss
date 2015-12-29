@@ -1,9 +1,15 @@
+$dark-grey: #2B3133;
+$light-blue-grey: #B6BDBF;
+$burnt-orange: #ED5749;
+$dark-burnt-orange: #BE463A;
+$focused-grey: #75797A;
+
 html, body {
 	margin: 0px;
 	padding: 0px;
 	height: 100%;
 	width: 100%;
-	background-color: #B6BDBF;
+	background-color: $light-blue-grey;
 	// border: none;
 }
 
@@ -18,7 +24,7 @@ html, body {
 	position: fixed;
 	left: 0px;
 	height: 100%;
-	background-color: #2B3133;
+	background-color: $dark-grey;
 	width: 200px;
 }
 
@@ -28,11 +34,11 @@ html, body {
 	top: 15px;
 	width: 30px;
 	height: auto;
-	z-index: 9999;
+	z-index: 10;
 }
 
 #graph-container {
-	z-index: -99999;
+	z-index: -10;
 	height: 100%;
 	width: 100%;
 	overflow: hidden;
@@ -44,11 +50,41 @@ canvas {
 	// overflow: hidden;
 }
 
-#title {
+h1 {
+	font-family: 'Inconsolata', bold;
+	color: $burnt-orange;
+}
+
+#title{
 	position: fixed;
 	top: 15px;
 	right: 15px;
 	font-size: 25px;
-	font-family: 'Inconsolata', bold;
-	color: #ED5749;
+}
+
+#animate-button {
+	h1 {
+		display: block;
+		font-size: 18px;
+	}
+
+	background-color: $light-blue-grey;
+	border: 1px solid $dark-grey;
+	position: fixed;
+	bottom: 15px;
+	right: 15px;
+	padding: 5px;
+	box-shadow: none;
+	-webkit-appearance: none;
+	outline: none !important;
+	z-index: 1;
+	cursor: pointer;
+
+	:focus {
+		background-color: $focused-grey;
+	}
+}
+
+#animate-button:hover {
+	background-color: $dark-grey;
 }

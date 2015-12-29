@@ -111,7 +111,6 @@ Graph.renderLoop = function() {
     if (Graph.stop_render == false){
         requestAnimationFrame(Graph.renderLoop);
         Graph.render();
-        console.log("rendering");
     }
 }
 
@@ -141,7 +140,6 @@ Graph.render = function() {
 }
 
 Graph.animateLoop = function() {
-    console.log("animating");
     if (Graph.stop_animate == false){
         Graph.animate();
         setTimeout(Graph.animateLoop, 20);

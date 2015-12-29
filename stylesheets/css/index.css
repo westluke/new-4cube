@@ -24,10 +24,10 @@ html, body {
   top: 15px;
   width: 30px;
   height: auto;
-  z-index: 9999; }
+  z-index: 10; }
 
 #graph-container {
-  z-index: -99999;
+  z-index: -10;
   height: 100%;
   width: 100%;
   overflow: hidden; }
@@ -36,12 +36,35 @@ canvas {
   height: 100%;
   width: 100%; }
 
+h1 {
+  font-family: 'Inconsolata', bold;
+  color: #ED5749; }
+
 #title {
   position: fixed;
   top: 15px;
   right: 15px;
-  font-size: 25px;
-  font-family: 'Inconsolata', bold;
-  color: #ED5749; }
+  font-size: 25px; }
+
+#animate-button {
+  background-color: #B6BDBF;
+  border: 1px solid #2B3133;
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  padding: 5px;
+  box-shadow: none;
+  -webkit-appearance: none;
+  outline: none !important;
+  z-index: 1;
+  cursor: pointer; }
+  #animate-button h1 {
+    display: block;
+    font-size: 18px; }
+  #animate-button :focus {
+    background-color: #75797A; }
+
+#animate-button:hover {
+  background-color: #2B3133; }
 
 /*# sourceMappingURL=index.css.map */

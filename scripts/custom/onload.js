@@ -23,6 +23,17 @@ $(document).ready(function() {
         Graph.fitNewSize();
     };
 
+	$("#animate-button").click(function() {
+		if (Graph.stop_animate){
+			Graph.startAnimate();
+			$("#animate-button h1").text("Stop animation");
+		}
+		else {
+			Graph.stopAnimate();
+			$("#animate-button h1").text("Animate");
+		}
+	});
+
     Graph.startRender();
-    // Graph.startAnimate();
+    Graph.startAnimate();
 });
