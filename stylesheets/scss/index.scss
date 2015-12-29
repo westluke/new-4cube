@@ -43,3 +43,12 @@ canvas {
 	width: 100%;
 	// overflow: hidden;
 }
+
+#title {
+	position: fixed;
+	top: 15px;
+	right: 15px;
+	font-size: 25px;
+	font-family: 'Inconsolata', bold;
+	color: #ED5749;
+}

@@ -36,4 +36,12 @@ canvas {
   height: 100%;
   width: 100%; }
 
+#title {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  font-size: 25px;
+  font-family: 'Inconsolata', bold;
+  color: #ED5749; }
+
 /*# sourceMappingURL=index.css.map */
