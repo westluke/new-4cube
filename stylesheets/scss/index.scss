@@ -23,9 +23,16 @@ html, body {
 	display: block;
 	position: fixed;
 	left: 0px;
+	top:0px;
 	height: 100%;
 	background-color: $dark-grey;
-	width: 200px;
+	width: 300px;
+	overflow: scroll;
+	z-index: 3;
+}
+
+::-webkit-scrollbar {
+	display: none;
 }
 
 #menu-icon{
@@ -34,7 +41,7 @@ html, body {
 	top: 15px;
 	width: 30px;
 	height: auto;
-	z-index: 10;
+	z-index: 4;
 }
 
 #graph-container {
@@ -62,7 +69,24 @@ h1 {
 	font-size: 25px;
 }
 
-#animate-button {
+@keyframes pulse {
+	0% {background-color: $dark-grey}
+	50% {background-color: $light-blue-grey}
+	100% {background-color: $dark-grey}
+}
+
+#help-box {
+	position: fixed;
+	left: 20%;
+	top: 15px;
+	height: calc(100% - 30px);
+	width: 60%;
+	border: 2px solid red;
+	z-index: 3;
+	overflow: scroll;
+}
+
+.button {
 	h1 {
 		display: block;
 		font-size: 18px;
@@ -70,8 +94,8 @@ h1 {
 
 	background-color: $light-blue-grey;
 	border: 1px solid $dark-grey;
+	border-radius: 1px;
 	position: fixed;
-	bottom: 15px;
 	right: 15px;
 	padding: 5px;
 	box-shadow: none;
@@ -85,6 +109,230 @@ h1 {
 	}
 }
 
-#animate-button:hover {
+.button:hover {
 	background-color: $dark-grey;
+}
+
+#animate-button {
+	bottom:15px;
+}
+
+#reset-button {
+	bottom: 50px;
+}
+
+#help-button {
+	bottom: 85px;
+	animation-name: pulse;
+	animation-duration: 2s;
+	animation-iteration-count: infinite;
+
+	a {
+		color: $burnt-orange;
+		text-decoration: none;
+	}
+	// animation-timing-function: linear;
+}
+
+#manual-control {
+	margin-top: 60px;
+}
+
+.border-div {
+	height: 5px;
+	border-bottom: 1px solid $burnt-orange;
+	width: calc(100% - 50px);
+	margin-left: 15px;
+}
+
+.gui-container {
+	width: 100%;
+	margin-top: 15px;
+	min-width: 300px;
+	// position: relative;
+	// right: 20px;
+	// margin-left: 15px;
+	// width: calc(100% - 15px);
+	// margin-bottom: 15px;
+	h2 {
+		font-family: 'Inconsolata';
+		// font-weight: bold;
+		font-size: 16px;
+		color: $burnt-orange;
+		margin-left: 15px;
+	}
+}
+
+.dg.main.a {
+	margin: 0px !important;
+	width: calc(100% - 10px) !important;
+	color: $burnt-orange !important;
+	font-family: 'Inconsolata' !important;
+	font-size: 14px !important;
+	// font-family: 'Inconsolata';
+	// font-weight: bold;
+	// font-size: 14px;
+	// overflow: hidden !important;
+	// padding: 0px !important;
+}
+
+.number input {
+	color: $light-blue-grey !important;
+}
+
+.color input {
+	width: 62% !important;
+	margin-right: 60px;
+	height: 9px;
+	border-radius: 1px;
+}
+
+.cr {
+	background-color: $dark-grey !important;
+	border: none !important;
+	// padding: 0px !important;
+	height: 20px !important;
+	// text-shadow: none !important;
+	// overflow: hidden !important;
+
+	.c input {
+		// color: $burnt-orange !important;
+		font-family: 'Inconsolata' !important;
+		position: relative;
+		bottom: 3px;
+		// font-weight: bold !important;
+		font-size: 14px !important;
+		// padding: 0px !important;
+		background-color: $dark-grey;
+		// margin-top: 6px !important;
+		// text-align: right !important;
+
+		// margin-right: 25px !important;
+
+	}
+
+	.c {
+		width: 59% !important;
+		float: right !important;
+	}
+
+	.slider {
+		background-color: $light-blue-grey !important;
+		height: 15px !important;
+		border-radius: 1px;
+		// margin-top: 8px !important;
+		// text-align: right !important;
+		// width: calc(66% - 15px) !important;
+	}
+
+	.slider-fg {
+		background-color: $burnt-orange !important;
+		border-radius: 1px;
+	}
+}
+
+.dg .property-name {
+	position: relative;
+	bottom: 3px;
+	text-shadow: none !important;
+	// margin-bottom: 10px;
+	// overflow: visible !important;
+	// z-index: 9999999999 !important;
+}
+
+.close-button {
+	display: none !important;
+}
+
+input:hover {
+	background-color: $focused-grey !important;
+}
+
+#geometry-gui .dg.main.a {
+	min-height: 120px !important;
+}
+
+#animation-gui .dg.main.a {
+	min-height: 160px !important;
+}
+
+#manual-gui .dg.main.a {
+	min-height: 120px !important;
+}
+
+.apply-button {
+	position: absolute;
+	left: 60px;
+	// top: 1px;
+	margin-top: 3px;
+	font-family: 'Inconsolata';
+	font-size: 12px;
+	color: $burnt-orange;
+	background-color: $dark-grey;
+	border: 1px solid $light-blue-grey;
+	border-radius: 1px;
+	padding: 2px;
+	font-weight: bold;
+	cursor: pointer;
+	z-index: 100;
+}
+
+.apply-button:hover {
+	// display: none;
+	background-color: $light-blue-grey;
+}
+
+#points-gui1 {
+	float: left;
+	// background-color: yellow;
+}
+
+#points-gui2 {
+	float: left;
+	// background-color: red;
+}
+
+.pgui {
+	width: calc(50% - 30px);
+	height: 5px;
+	margin-right: 15px;
+}
+
+#points-button-container {
+	// border: 2px solid red;
+	position: absolute;
+	bottom: 23px;
+	left: 15px;
+}
+
+#points-customizer button{
+	margin-right: 20px;
+	color: $burnt-orange;
+	font-size: 12px;
+	font-family: 'Inconsolata';
+	font-weight: bold;
+	padding: 2px;
+	border: 1px solid $light-blue-grey;
+	background-color: $dark-grey;
+	z-index: 100;
+	cursor: pointer;
+	border-radius: 1px;
+}
+
+
+#points-customizer button:hover {
+	background-color: $light-blue-grey;
+}
+
+#points-customizer .dg.main.a{
+	min-height: 100px;
+}
+
+#points-customizer {
+	min-height: 140px;
+	position: relative;
+}
+
+#points-edit {
+	display: none;
 }

@@ -199,23 +199,8 @@ Graph.init = function(  options,				// parameters for the display of the graph
                         camera_args,			// fov, aspect ratio, near and far fields
                         min_zoom, max_zoom){	// how far the camera can zoom.
 
-	/*
-	Slight problem that must be watched carefully:
-		points and perspective_points must be absolutely parallel.
-		Have to make sure that perspectify is safe, and that it is the only thing that operates
-		on perspective_points.
-	*/
-
-	// Creates the 4cube vector lines and points, aliased together, and centered on the origin.
-	this.lines = this.arrayToVectors(this.array_lines);
-	this.points = this.aliasVectorLinesToPoints(this.lines);
-	this.center(this.points);
-
-	// Does the same thing as above, but then perspectifies them. These are the points that will actually
-	// be used in graphing.
-	this.perspective_lines = this.arrayToVectors(this.array_lines);
-	this.perspective_points = this.aliasVectorLinesToPoints(this.perspective_lines);
-	this.perspectify(this.points, this.perspective_points);
+	this.initLines();
+	this.animate_count = 0;
 
     this.matrix_rotate_distance = matrix_rotate_distance;
     this.options = options;
@@ -227,7 +212,8 @@ Graph.init = function(  options,				// parameters for the display of the graph
                         wz: Matrix.rotateWZ_4d(matrix_rotate_distance)}
 
 	// The rotation that the animate() function will use on the graph. xw is the most impressive.
-	this.current_rotation = this.rotations.xw;
+	// this.current_rotation = this.rotations.xw;
+	this.current_rotation = this.rotations.xw.multiply(this.rotations.wy).multiply(this.rotations.wz).multiply(this.rotations.xy).multiply(this.rotations.yz).multiply(this.rotations.zx);
 
 	// Rendering and animation must be started by onload.js.
 	this.stop_render = true;
@@ -277,11 +263,15 @@ when called in requestAnimationFrame.
 Should be independent of the changing of the graph, this is just the drawing of it.
 */
 Graph.renderLoop = function() {
-	if (Graph.stop_animate == false){
-		Graph.animate();
+	if (!Graph.stop_animate){
+		if (Graph.animate_count % Graph.options.animate_wait == 0){
+			Graph.animate();
+			Graph.animate_count = 0;
+		}
+		Graph.animate_count++;
 	}
 
-    if (Graph.stop_render == false){
+    if (!Graph.stop_render){
         requestAnimationFrame(Graph.renderLoop);
         Graph.render();
     }
@@ -374,6 +364,7 @@ Graph.plot = function(lines, points){
 			),
 			new THREE.MeshLambertMaterial({color: this.options.color, wireframe: this.options.wireframe})
 		);
+
 		mesh.isASphere = false;						// Tag tells animate it should do more than change position.
 		mesh.geometry.verticesNeedUpdate = false;	// Saves memory, and the entire geometry will be remade, so no vertices need to change.
 		mesh.frustumCulled = false;					// Don't let the camera destroy the whole mesh when it gets too close.
@@ -385,7 +376,7 @@ Graph.plot = function(lines, points){
 	for (index in points){
 		var sphere_mesh = new THREE.Mesh(
 			new THREE.SphereGeometry(this.options.radius, this.options.sphere_segments, this.options.sphere_segments),
-			new THREE.MeshLambertMaterial({color: this.options.color, wireframe: this.options.wireframe, shading: THREE.FlatShading, shininess: 0})		// We need Phong because Lambert won't do flat shading.
+			new THREE.MeshLambertMaterial({color: this.options.color, wireframe: this.options.wireframe})		// We need Phong because Lambert won't do flat shading.
 		)
 		sphere_mesh.isASphere = true;
 		sphere_mesh.position.set(points[index].x, points[index].y, points[index].z)		// Have to set the actual position with spheres.
@@ -395,4 +386,53 @@ Graph.plot = function(lines, points){
 		this.scene.add(sphere_mesh);
 		this.meshes.push(sphere_mesh);
 	}
+}
+
+Graph.clear = function() {
+	for (index in this.points){
+		this.points[index] = null;
+		this.perspective_points[index] = null;
+	}
+
+	this.points = null;
+	this.lines = null;
+	this.perspective_points = null;
+	this.perspective_lines = null;
+
+	for (index in this.meshes){
+		this.scene.remove(this.meshes[index]);
+		this.meshes[index].geometry.dispose();
+		this.meshes[index].material.dispose();
+	}
+	this.meshes = null;
+	this.stopAnimate();
+}
+
+/*
+Create the starting lines and points for the graph.
+*/
+Graph.initLines = function() {
+	/*
+	Slight problem that must be watched carefully:
+		points and perspective_points must be absolutely parallel.
+		Have to make sure that perspectify is safe, and that it is the only thing that operates
+		on perspective_points.
+	*/
+
+	// Creates the 4cube vector lines and points, aliased together, and centered on the origin.
+	this.lines = this.arrayToVectors(this.array_lines);
+	this.points = this.aliasVectorLinesToPoints(this.lines);
+	this.center(this.points);
+
+	// Does the same thing as above, but then perspectifies them. These are the points that will actually
+	// be used in graphing.
+	this.perspective_lines = this.arrayToVectors(this.array_lines);
+	this.perspective_points = this.aliasVectorLinesToPoints(this.perspective_lines);
+	this.perspectify(this.points, this.perspective_points);
+}
+
+Graph.reset = function() {
+	this.clear();
+	this.meshes = [];
+	this.initLines();
 }

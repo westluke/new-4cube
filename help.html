@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="stylesheets/css/help.css">
+	</head>
+
+	<body>
+		<button class="button"><a href="index.html"><h1>< Return to simulation</h1></a></button>
+
+		<div id="content-container">
+			<!-- <h1> Hello, there! </h1> -->
+			<h1>Welcome, newcomer! This is 4Shadow.io, a simulation of a 4-dimensional hypercube. </h1>
+			<!-- <p>&nbsp;&nbsp;&nbsp;&nbsp;Hello, visitor! It looks like you haven't been here before, so here's a bit of an explanation of all that stuff you saw on the other page.</p> -->
+
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;What you see on the simulation page is a projection of that hypercube,
+				sort of like shining a light on it from above and looking at the shadow.
+				In the real world, shadows are always two-dimensional. However, in the fourth dimension
+				we can consider the possibility of 3-dimensional shadows.</p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;This has the benefit of looking incredibly cool. If you want to see more, here's how
+				to use the site and play with some of the projection and display settings. First off, to get access to all of those
+				settings click the settings icon in the top left corner of the simulation page. (If part of it is cut off, remember that it scrolls.)
+			</p>
+			<h1>Dragging rotation</h1>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;This one's pretty intuitive. Click the figure and drag to rotate it in space. Sometimes it's a little confusing
+			how it's being dragged, though, so I have a much more precise option:</p>
+
+			<h1>Manual control (from the settings bar)</h1>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;Here, you can choose an exact degree angle to rotate the figure by, and on which pair of axes.
+				For instance, if you would like to rotate it 1.5 radians counterclockwise on the xy plane, drag the xy slider
+				to -1.5 and hit the "apply" button. You might notice that there are 6 sliders, 3 more than would be used for 3d rotations.
+				That's because we have a new axis extending into the 4th dimension, the w-axis, which combines with the others to produce 3 extra planes for rotation.
+			</p>
+			<h1>Animation control</h1>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;Here, you can adjust the rotation and speed of the hypercube. The sliders are notated in radians per second,
+				so if you want the hypercube to be rotating at 2 radians per second on the xw plane, move the xw slider to 1.5.
+			</p>
+			<h1>Geometry control</h1>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;This menu allows you to adjust how the projection is being displayed. By default, lines are represented by 20-sided polygon prisms,
+				and points are represented by spheres. You can change the detail of the shapes, their thickness, their color, or enable wireframe mode.
+			</p>
+			<h1>Custom points</h1>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;This one is quite cool, but it's still got some bugs that I'm working out. It lets you plot your own
+				4-dimensional shapes and rotate them like the hypercube. To use it, just input the coordinates for 2 points and hit apply.
+				The line connecting those points will be plotted in the simulation.
+			</p>
+			<h1>About me</h1>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;My name is Luke West, and I'm a junior at Lexington High School in Massachusetts. If you notice a bug on my site, please PLEASE raise an issue
+				on my github repository, <a href="https://github.com/westluke/new-4cube">right here.</a>
+			</p>
+		</div>
+	</body>
+</html>

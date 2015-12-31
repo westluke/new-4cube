@@ -52,3 +52,64 @@ When a new transformation is applied, it is applied ONLY to the vectors in point
 The points are then passed through the perspectify function, which copies the data into the perspective_points function.
 This will also, of course, update the perspective_lines array.
 At this point, the perspective_lines can be used to build new geometries and update the meshes.
+
+COMMENTS FROM GRAPH.JS:
+During program execution, the real 4d points and lines are kept in vector form
+In the plot stage, the vector_lines and points are perspectified, and the new perspetive points stored in a list
+the vectors in that list are cloned into the proper meshes, and then the perspective list is destroyed completely
+
+shit. The animate stage will have to be very very different
+
+during the animate loop, what happens?
+the actual 4d vectors need to be transformed with the current rotation
+then they need to be perspectified (very quick actually), and passed into the meshes somehow. HOW?
+can I just update their geometries? that was the old approach, and I think it's best. make new geometry each time, delete the old.
+
+Oh. I would have had to do that anyways, because I'm transforming 4d vectors, not 3d.
+
+Perspectify: pretend that the point with the lowest w-value is actually at w=1, with the rest of the shape moved
+				accordingly. Now, for every point, divide the x, y, and z-values by the point's w-value
+
+should I store vector_lines AND vector_points? I think so.
+perspective lines and points are NEVER stored. There is no point in storing them, because we only transform the others.
+
+NEW STRUCTURE:
+the only thing we change is the points lists.
+The lines lists actually only contain references to the vectors in the points lists, so we only need to change those.
+This means that we need to build the points lists, then use a connections matrix to build the lines lists.
+
+THEN we copy the vectors into a perspective points list, and reference those in a perspective lines list.
+
+ORDER OF IMPLEMENTATION:
+get connections array
+make the function to build the vector_lines based off the vector_points
+test that transforming the vector_points transforms the vector_lines
+
+how should plot work now?
+make a new function that does the geometry creation, so it can be used in animate
+
+Also, for efficiency,  extrusion geometries should only ever use LambertMaterials
+and sphere geometries should only ever use PhongMaterials. Need to recognize which is which in animate().
+
+function takes in vector_lines array, produces aliased vector_points arrays
+also goes through original array, and if any vectors are the same, those are aliased to each other.
+
+
+dat_gui:
+
+uses the gui to change the values in the give object.
+
+if they've never visited the site before, the help/about button should just softly pulse.
+It should lead to another page, which can explain in detail and expand beyond the window.
+
+course:
+get the gui working for manual rotations, animations, etc.
+Get the points customizer working
+add node, use cookies to get a starting help window that can also be accessed from the main display.
+ensure compatibility with other browsers
+get mobile working and nice
+add higher dimensions
+
+
+selective hide and show for the panels might be the best option. No, just have the settings div scroll.
+I want the user to have everything available, all the time, especially considering I almost have enough space.

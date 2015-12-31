@@ -13,13 +13,67 @@ Start box not taking up all of screen, so doesn't actually cover.-->
 		<script src="scripts/jquery-1.11.3.min.js"></script>
 		<script src="scripts/mrdoob-three.js-1f968fe/build/three.js"></script>
 		<script src="scripts/TrackballControls.js"></script>
+		<script src="scripts/dat-gui/build/dat.gui.js"></script>
 
 		<script src="scripts/custom/Matrix.js"></script>
 		<script src="scripts/custom/Graph.js"></script>
 		<script src="scripts/custom/onload.js"></script>
+		<script src="scripts/custom/Settings.js"></script>
+
+		<link rel="icon" type="image/png" href = "assets/favicon (4).ico"
 	</head>
-	<body>
+	<body scroll="no">
+
 		<div id="settings">
+			<div id="points-edit">
+				<button onclick="Settings.returnToSettings()"><</button>
+			</div>
+			<div id="manual-control" class="gui-container">
+				<h2>
+					Manual rotations
+				</h2>
+				<!-- Have to give it a special div, otherwise it goes after the clearing div. -->
+				<div id = "manual-gui">
+				</div>
+
+				<!-- Forces the containing div to actually get the correct height, and not collapse to the h2. -->
+				<div style="clear: both" class="border-div"></div>
+			</div>
+
+			<div id="animation-control" class="gui-container">
+				<h2>
+					Animation control
+				</h2>
+				<div id="animation-gui">
+				</div>
+				<div style="clear: both" class="border-div"></div>
+			</div>
+
+			<div id="geometries-control" class="gui-container">
+				<h2>
+					Geometry control
+				</h2>
+				<div id="geometry-gui">
+				</div>
+				<div style="clear: both" class="border-div"></div>
+			</div>
+
+			<div id="points-customizer" class="gui-container">
+				<h2>
+					Points customizer
+				</h2>
+				<div id="points-gui1" class="pgui">
+				</div>
+				<div id="points-gui2" class="pgui">
+				</div>
+				<div id="points-button-container">
+					<button>Plot</button>
+					<button>Clear all</button>
+					<button onclick="Settings.displayPoints()">Edit current points</button>
+				</div>
+				<div style="clear: both"></div>
+				<!-- <div style="clear: both" class="border-div"></div> -->
+			</div>
 		</div>
 
 		<h1 id = "title">
@@ -31,9 +85,18 @@ Start box not taking up all of screen, so doesn't actually cover.-->
 		</a>
 
 		<div id="graph-container">
-			<button id="animate-button">
+			<button class="button" id="animate-button">
 				<h1>
 					Stop animation
+				</h1>
+			<button class="button" id="reset-button">
+				<h1>
+					Reset
+				</h1>
+			</button>
+			<button class="button" id="help-button">
+				<h1>
+					<a href="help.html">Help / About</a>
 				</h1>
 			</button>
 		</div>
