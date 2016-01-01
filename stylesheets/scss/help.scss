@@ -30,7 +30,7 @@ body {
 	height: 100%;
 	width: 100%;
 	background-color: $dark-grey;
-	font-family: 'Inconsolata';
+	font-family: 'Inconsolata', monospace;
 	color: $light-blue-grey;
 	// border: none;
 }
@@ -71,7 +71,7 @@ html {
 	h1 {
 		display: block;
 		font-size: 18px;
-		font-family: 'Inconsolata';
+		font-family: 'Inconsolata', monospace;
 		color: $light-blue-grey;
 		text-decoration: none;
 	}

@@ -57,6 +57,13 @@ Graph.array_lines = [
 [ [1,1,1,0], [1,1,0,0] ],
 [ [1,1,0,0], [1,1,0,1] ] ];
 
+// for (var i in Graph.array_lines){
+// 	for (var j in Graph.array_lines[i][0]){
+// 		Graph.array_lines[i][0][j] *= 0.2;
+// 		Graph.array_lines[i][1][j] *= 0.2;
+// 	}
+// }
+
 // This is where the graphed meshes will be stored to be updated in animate().
 Graph.meshes = [];
 
@@ -330,6 +337,7 @@ and updates the curret meshes accordingly.
 */
 Graph.animate = function() {
 	this.transformVectors(this.points, this.current_rotation);
+	this.center(this.points);
 	this.perspectify(this.points, this.perspective_points);
 	this.updateMeshes(this.perspective_points, this.perspective_lines);
 }

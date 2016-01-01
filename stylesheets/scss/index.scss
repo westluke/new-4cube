@@ -6,7 +6,7 @@ $focused-grey: #75797A;
 $focus: #5c5e66;
 
 noscript {
-	font-family: 'Inconsolata';
+	font-family: 'Inconsolata', monospace;
 	color: $burnt-orange;
 	font-size: 20px;
 	font-weight: bold;
@@ -38,7 +38,7 @@ html, body {
 	height: 100%;
 	width: 100%;
 	background-color: $light-blue-grey;
-	font-family: 'Inconsolata';
+	font-family: 'Inconsolata', monospace;
 	color: $burnt-orange;
 }
 
@@ -58,7 +58,7 @@ canvas {
 }
 
 h1, h2 {
-	font-family: 'Inconsolata', bold;
+	font-family: 'Inconsolata', monospace, bold;
 	color: $burnt-orange;
 }
 
@@ -169,7 +169,7 @@ h1, h2 {
 	min-width: 300px;
 
 	h2 {
-		font-family: 'Inconsolata';
+		font-family: 'Inconsolata', monospace;
 		font-size: 16px;
 		color: $burnt-orange;
 		margin-left: 15px;
@@ -181,7 +181,7 @@ h1, h2 {
 	width: calc(100% - 10px) !important;
 	min-width: calc(100% - 10px) !important;
 	color: $burnt-orange !important;
-	font-family: 'Inconsolata' !important;
+	font-family: 'Inconsolata', monospace !important;
 	font-size: 14px !important;
 
 	.close-button {
@@ -248,7 +248,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 		float: right !important;
 
 		input {
-			font-family: 'Inconsolata' !important;
+			font-family: 'Inconsolata', monospace !important;
 			position: relative;
 			bottom: 3px;
 			font-size: 14px !important;
@@ -288,7 +288,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 	position: absolute;
 	left: 60px;
 	margin-top: 3px;
-	font-family: 'Inconsolata';
+	font-family: 'Inconsolata', monospace;
 	font-size: 13px;
 	color: $burnt-orange;
 	background-color: $dark-grey;
@@ -328,7 +328,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 	margin-right: 10px;
 	color: $burnt-orange;
 	font-size: 13px;
-	font-family: 'Inconsolata';
+	font-family: 'Inconsolata', monospace;
 	font-weight: bold;
 	padding: 2px;
 	// border: 1px solid $light-blue-grey;
@@ -398,7 +398,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 				// margin-top: -1px;
 				background-color: inherit;
 				color: $burnt-orange;
-				font-family: 'Inconsolata';
+				font-family: 'Inconsolata', monospace;
 				// cursor: pointer;
 				// padding: 2px;
 				box-shadow: none;
@@ -415,7 +415,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 	.big {
 		color: $burnt-orange;
 		// text-decoration: underline;
-		font-family: 'Inconsolata';
+		font-family: 'Inconsolata', monospace;
 		font-weight: bold;
 		font-size: 18px;
 		background-color: $dark-grey;

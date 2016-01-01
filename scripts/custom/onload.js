@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	console.log(Matrix.rs.xw(3.14));
     graph_options = {
 		color: 15554377,
 		wireframe: false,
