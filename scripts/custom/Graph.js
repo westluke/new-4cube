@@ -311,6 +311,8 @@ Graph.renderLoop = function() {
     }
 }
 
+//test
+
 /*
 Contains everything that should happen in one single drawing of the image.
 The image is updated, the controls are updated, and the light is moved to the correct position.
