@@ -5,6 +5,35 @@ $dark-burnt-orange: #BE463A;
 $focused-grey: #75797A;
 $focus: #5c5e66;
 
+noscript {
+	font-family: 'Inconsolata';
+	color: $burnt-orange;
+	font-size: 20px;
+	font-weight: bold;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+
+	z-index: 201;
+
+	div {
+		position: fixed;
+		top: -300px;
+		left: -300px;
+		width: calc(100% + 1000px);
+		height: calc(100% + 1000px);
+		z-index: 200;
+		background-color: $light-blue-grey;
+	}
+
+	p {
+		position: fixed;
+		top: 50px;
+		left: 50px;
+		width: 50%;
+	}
+}
+
 html, body {
 	height: 100%;
 	width: 100%;
