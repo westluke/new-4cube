@@ -50,19 +50,19 @@ Settings.init = function() {
 
 	this.animate_keep.xy = this.animate_keep.yz = this.animate_keep.zx = this.animate_keep.wy = this.animate_keep.wz = 0.0;
 
-	// for (var i in animate_gui.__controllers){
-	// 	animate_gui.__controllers[i].onChange(function() {
-	// 		this.updateDisplay();
-	// 		Settings.changeAnimateRotationFromKeyValue(this.property, Settings.animate_keep[this.property]);
-	// 	});
-	// 	animate_gui.__controllers[i].updateDisplay();
-	// }
+	for (var i in animate_gui.__controllers){
+		animate_gui.__controllers[i].onChange(function() {
+			this.updateDisplay();
+			Settings.changeAnimateRotationFromKeyValue(this.property, Settings.animate_keep[this.property]);
+		});
+		animate_gui.__controllers[i].updateDisplay();
+	}
 
 	animate_gui.__controllers[6].onChange(function() {
 		Graph.options.animate_wait = Settings.animate_keep["skipped renders"] + 1;
 		this.updateDisplay();
-		console.log("hello fuck");
-		console.log(Graph.options.animate_wait);
+		// console.log("hello fuck");
+		// console.log(Graph.options.animate_wait);
 	});
 	//
 	// this.animate_keep["skipped renders"] = 18;
