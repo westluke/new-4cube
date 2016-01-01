@@ -1,17 +1,14 @@
 $(document).ready(function() {
-    var graph_options = {
+    graph_options = {
 		color: 15554377,
-		// color: 0xED5749,
-		// color: Settings.rgbToHex([1, 1, 1]),
 		wireframe: false,
 		radius: 0.03,
-		sphere_segments: 8,
-		extrude_segments: 20,
-		animate_wait: 2
+		sphere_segments: 8,		// How many segments in the corner spheres
+		extrude_segments: 20,	// How many vertices on the extrusions shape
+		animate_wait: 2			// How many frames to skip (+1) before animating
 	};
 
-	// find ratio between rotate distance and animate_wait to make sure good performance always.
-    var matrix_rotate_distance = 0.003;
+    var starting_rotate_distance = 0.003;
     var camera_coordinates = [0, 0, 2];
 
     var camera_args = {
@@ -23,12 +20,14 @@ $(document).ready(function() {
     var min_zoom = 0.1;
     var max_zoom = 3;
 
-    Graph.init(graph_options, matrix_rotate_distance, camera_coordinates, camera_args, min_zoom, max_zoom);
+    Graph.init(graph_options, starting_rotate_distance, camera_coordinates, camera_args, min_zoom, max_zoom);
 	Settings.displayLines(Graph.lines);
 	Graph.plot(Graph.perspective_lines, Graph.perspective_points);
+	// console.log(Graph.meshes);
 
-	Graph.startRender();
-	Graph.startAnimate();
+	// console.log("ONLOAD " , Graph.animating, " ", Graph.rendering);
+	Graph.startRenderAndAnimate();
+	// console.log("ONLOAD TWO" , Graph.animating, " ", Graph.rendering);
 
     $("#menu-icon").click(function() {
         console.log("menu icon was clicked");
@@ -46,10 +45,11 @@ $(document).ready(function() {
     };
 
 	$("#animate-button").click(function() {
-		if (Graph.stop_animate){
-			Graph.startAnimate();
+		if (!Graph.animating){
+			Graph.startRenderAndAnimate();
 			$("#animate-button h1").text("Stop animation");
 		}
+
 		else {
 			Graph.stopAnimate();
 			$("#animate-button h1").text("Animate");
@@ -57,10 +57,8 @@ $(document).ready(function() {
 	});
 
 	$("#reset-button").click(function() {
-		$("#animate-button h1").text("Animate");
-		Graph.stopAnimate();
+		// $("#animate-button h1").text("Animate");
 		Graph.reset();
-		Graph.plot(Graph.perspective_lines, Graph.perspective_points);
 	})
 
 	Settings.init();

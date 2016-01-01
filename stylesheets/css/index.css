@@ -33,7 +33,7 @@ h1, h2 {
   background-color: #2B3133;
   width: 300px;
   overflow-y: scroll;
-  overflow-x: visible;
+  overflow-x: hidden;
   z-index: 3; }
 
 #graph-container {
@@ -253,36 +253,35 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
   background-color: #2B3133;
   height: 100%;
   z-index: 99;
-  font-size: 13px; }
-  #points-edit p {
-    margin-top: 5px; }
-  #points-edit div {
+  font-size: 13px;
+  overflow-y: scroll; }
+  #points-edit #points-edit-containers {
     margin-top: 60px; }
-  #points-edit #points-delete-buttons {
-    float: right;
-    margin-right: 15px;
-    height: 100%;
-    width: 50px;
-    padding-top: 2px; }
-    #points-edit #points-delete-buttons button {
-      font-size: 13px;
-      margin-top: 1px;
+    #points-edit #points-edit-containers div {
+      width: 100%;
+      height: 16px;
+      position: relative;
       background-color: #2B3133;
-      color: #ED5749;
-      font-family: 'Inconsolata';
-      cursor: pointer;
-      padding: 2px;
-      box-shadow: none; }
-    #points-edit #points-delete-buttons button:hover {
-      background-color: #B6BDBF; }
-  #points-edit #points-left {
-    width: 190px;
-    margin-left: 15px;
-    float: left; }
-  #points-edit #points-right {
-    width: 190px;
-    margin-left: 15px;
-    float: left; }
+      cursor: pointer; }
+      #points-edit #points-edit-containers div * {
+        float: left; }
+      #points-edit #points-edit-containers div .point-left {
+        margin-left: 15px; }
+      #points-edit #points-edit-containers div .point-right {
+        position: absolute;
+        right: 100px; }
+      #points-edit #points-edit-containers div button {
+        float: right;
+        font-size: 13px;
+        position: absolute;
+        right: 10px;
+        padding-bottom: 4px;
+        background-color: inherit;
+        color: #ED5749;
+        font-family: 'Inconsolata';
+        box-shadow: none; }
+    #points-edit #points-edit-containers div:hover {
+      background-color: #5c5e66; }
   #points-edit .big {
     color: #ED5749;
     font-family: 'Inconsolata';

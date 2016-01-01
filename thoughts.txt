@@ -113,3 +113,19 @@ add higher dimensions
 
 selective hide and show for the panels might be the best option. No, just have the settings div scroll.
 I want the user to have everything available, all the time, especially considering I almost have enough space.
+problem: will have to manually add buttons to the gui's for manual rotations
+
+how to display plotted points and get them back for deletion?
+really don't want to just parse backwards.
+can store them in an initial list, but that takes space.
+
+animate CAN ONLY RUN if render is also running. critical.
+options for interface: animateAndRender or Render, not just Animate.
+
+FUCK there's a memory leak when you press reset.
+FOR THE FUTURE: WRITE UNIT TESTS. FUCK THOSE COULD HAVE BEEN SO HANDY
+ALSO MORE ISOLATION, MODIFYING GRAPH VARIABLES DIRECTLY IS BAD
+
+YEP, the slowdown is definitely coming from restarting the renderloop. I think its causing multiple copies to run at the same time.
+
+SO: NEVER EVER stop animateandrender and then immediately start again. If there is no delay, two different function loops will be started, and cause a memory leak.

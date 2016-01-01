@@ -46,7 +46,7 @@ h1, h2 {
 	background-color: $dark-grey;
 	width: 300px;
 	overflow-y: scroll;
-	overflow-x: visible;
+	overflow-x: hidden;
 	// overflow: visible;
 	z-index: 3;
 }
@@ -331,53 +331,56 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 	height: 100%;
 	z-index: 99;
 	font-size: 13px;
+	overflow-y: scroll;
 
-	p {
-		margin-top: 5px;
-	}
+	// p {
+	// 	margin-top: 5px;
+	// }
 
-	div {
+	#points-edit-containers {
 		margin-top: 60px;
-	}
 
-	#points-delete-buttons {
-		float: right;
-		margin-right: 15px;
-		height: 100%;
-		width: 50px;
-		// border: 1px solid red;
-		padding-top: 2px;
-
-		button {
-			font-size: 13px;
-			margin-top: 1px;
+		div{
+			width: 100%;
+			height: 16px;
+			position: relative;
 			background-color: $dark-grey;
-			color: $burnt-orange;
-			font-family: 'Inconsolata';
 			cursor: pointer;
-			padding: 2px;
-			box-shadow: none;
 
+			* {
+				float: left;
+			}
+			.point-left{
+				margin-left: 15px;
+			}
+			.point-right{
+				position: absolute;
+				right:100px;
+			}
+			button {
+				float: right;
+				// margin-right: 10px;
+				font-size: 13px;
+				position: absolute;
+				right: 10px;
+				padding-bottom: 4px;
+				// top: 1px;
+				// bottom: -2px;
+				// margin-top: -1px;
+				background-color: inherit;
+				color: $burnt-orange;
+				font-family: 'Inconsolata';
+				// cursor: pointer;
+				// padding: 2px;
+				box-shadow: none;
+			}
+				// button:hover {
+				// 	background-color: $light-blue-grey;
+				// }
 		}
-
-		button:hover {
-			background-color: $light-blue-grey;
+		div:hover {
+			background-color: $focus;
 		}
-	}
-
-	#points-left{
-		width: 190px;
-		// border: 2px solid red;
-		margin-left: 15px;
-		// margin-top: 4px;
-		float: left;
-	}
-
-	#points-right{
-		width: 190px;
-		// border: 2px solid red;
-		margin-left: 15px;
-		float: left;
 	}
 
 	.big {
