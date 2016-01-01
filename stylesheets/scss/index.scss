@@ -3,14 +3,14 @@ $light-blue-grey: #B6BDBF;
 $burnt-orange: #ED5749;
 $dark-burnt-orange: #BE463A;
 $focused-grey: #75797A;
+$focus: #5c5e66;
 
 html, body {
-	margin: 0px;
-	padding: 0px;
 	height: 100%;
 	width: 100%;
 	background-color: $light-blue-grey;
-	// border: none;
+	font-family: 'Inconsolata';
+	color: $burnt-orange;
 }
 
 *{
@@ -19,29 +19,36 @@ html, body {
 	border: none;
 }
 
-#settings {
-	display: block;
-	position: fixed;
-	left: 0px;
-	top:0px;
-	height: 100%;
-	background-color: $dark-grey;
-	width: 300px;
-	overflow: scroll;
-	z-index: 3;
-}
-
 ::-webkit-scrollbar {
 	display: none;
 }
 
-#menu-icon{
+canvas {
+	height: 100%;
+	width: 100%;
+}
+
+h1, h2 {
+	font-family: 'Inconsolata', bold;
+	color: $burnt-orange;
+}
+
+#settings-wrapper {
 	position: fixed;
-	left: 15px;
-	top: 15px;
-	width: 30px;
-	height: auto;
-	z-index: 4;
+}
+
+#settings {
+	display: block;
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	height: 100%;
+	background-color: $dark-grey;
+	width: 300px;
+	overflow-y: scroll;
+	overflow-x: visible;
+	// overflow: visible;
+	z-index: 3;
 }
 
 #graph-container {
@@ -51,15 +58,13 @@ html, body {
 	overflow: hidden;
 }
 
-canvas {
-	height: 100%;
-	width: 100%;
-	// overflow: hidden;
-}
-
-h1 {
-	font-family: 'Inconsolata', bold;
-	color: $burnt-orange;
+#menu-icon{
+	position: fixed;
+	left: 15px;
+	top: 15px;
+	width: 30px;
+	height: auto;
+	z-index: 4;
 }
 
 #title{
@@ -73,17 +78,6 @@ h1 {
 	0% {background-color: $dark-grey}
 	50% {background-color: $light-blue-grey}
 	100% {background-color: $dark-grey}
-}
-
-#help-box {
-	position: fixed;
-	left: 20%;
-	top: 15px;
-	height: calc(100% - 30px);
-	width: 60%;
-	border: 2px solid red;
-	z-index: 3;
-	overflow: scroll;
 }
 
 .button {
@@ -103,10 +97,6 @@ h1 {
 	outline: none !important;
 	z-index: 1;
 	cursor: pointer;
-
-	:focus {
-		background-color: $focused-grey;
-	}
 }
 
 .button:hover {
@@ -131,7 +121,6 @@ h1 {
 		color: $burnt-orange;
 		text-decoration: none;
 	}
-	// animation-timing-function: linear;
 }
 
 #manual-control {
@@ -149,14 +138,9 @@ h1 {
 	width: 100%;
 	margin-top: 15px;
 	min-width: 300px;
-	// position: relative;
-	// right: 20px;
-	// margin-left: 15px;
-	// width: calc(100% - 15px);
-	// margin-bottom: 15px;
+
 	h2 {
 		font-family: 'Inconsolata';
-		// font-weight: bold;
 		font-size: 16px;
 		color: $burnt-orange;
 		margin-left: 15px;
@@ -166,63 +150,91 @@ h1 {
 .dg.main.a {
 	margin: 0px !important;
 	width: calc(100% - 10px) !important;
+	min-width: calc(100% - 10px) !important;
 	color: $burnt-orange !important;
 	font-family: 'Inconsolata' !important;
 	font-size: 14px !important;
-	// font-family: 'Inconsolata';
-	// font-weight: bold;
-	// font-size: 14px;
-	// overflow: hidden !important;
-	// padding: 0px !important;
+
+	.close-button {
+		display: none !important;
+	}
+
+	.property-name {
+		position: relative;
+		bottom: 3px;
+		text-shadow: none !important;
+	}
+
+	.color{
+		height: 24px !important;
+
+		.property-name {
+			position: relative;
+			top: 2px;
+		}
+
+		input {
+			// display: none;
+			width: 62% !important;
+			margin-right: 60px;
+			position: relative;
+			height: 12px;
+			top: 2px;
+			border-radius: 1px;
+		}
+	}
 }
 
 .number input {
 	color: $light-blue-grey !important;
 }
 
-.color input {
-	width: 62% !important;
-	margin-right: 60px;
-	height: 9px;
-	border-radius: 1px;
+.cr.boolean, .cr.number{
+	height: 20px !important;
+
+	input {
+		background-color: $dark-grey;
+	}
+}
+
+html body #settings .gui-container .dg.main.a .cr input {
+	background-color: $dark-grey;
+}
+
+html body #settings .gui-container .dg.main.a .cr input:hover {
+	background-color: $focus;
+}
+
+html body #settings .gui-container .dg.main.a .cr input:focus {
+	background-color: $focus;
 }
 
 .cr {
 	background-color: $dark-grey !important;
 	border: none !important;
-	// padding: 0px !important;
 	height: 20px !important;
-	// text-shadow: none !important;
-	// overflow: hidden !important;
-
-	.c input {
-		// color: $burnt-orange !important;
-		font-family: 'Inconsolata' !important;
-		position: relative;
-		bottom: 3px;
-		// font-weight: bold !important;
-		font-size: 14px !important;
-		// padding: 0px !important;
-		background-color: $dark-grey;
-		// margin-top: 6px !important;
-		// text-align: right !important;
-
-		// margin-right: 25px !important;
-
-	}
 
 	.c {
 		width: 59% !important;
 		float: right !important;
+
+		input {
+			font-family: 'Inconsolata' !important;
+			position: relative;
+			bottom: 3px;
+			font-size: 14px !important;
+		}
+
+		input[type="checkbox"]{
+			position: relative;
+			right: 3px;
+		}
 	}
 
 	.slider {
 		background-color: $light-blue-grey !important;
 		height: 15px !important;
 		border-radius: 1px;
-		// margin-top: 8px !important;
-		// text-align: right !important;
-		// width: calc(66% - 15px) !important;
 	}
 
 	.slider-fg {
@@ -231,29 +243,12 @@ h1 {
 	}
 }
 
-.dg .property-name {
-	position: relative;
-	bottom: 3px;
-	text-shadow: none !important;
-	// margin-bottom: 10px;
-	// overflow: visible !important;
-	// z-index: 9999999999 !important;
-}
-
-.close-button {
-	display: none !important;
-}
-
-input:hover {
-	background-color: $focused-grey !important;
-}
-
 #geometry-gui .dg.main.a {
-	min-height: 120px !important;
+	min-height: 100px !important;
 }
 
 #animation-gui .dg.main.a {
-	min-height: 160px !important;
+	min-height: 120px !important;
 }
 
 #manual-gui .dg.main.a {
@@ -263,13 +258,11 @@ input:hover {
 .apply-button {
 	position: absolute;
 	left: 60px;
-	// top: 1px;
 	margin-top: 3px;
 	font-family: 'Inconsolata';
-	font-size: 12px;
+	font-size: 13px;
 	color: $burnt-orange;
 	background-color: $dark-grey;
-	border: 1px solid $light-blue-grey;
 	border-radius: 1px;
 	padding: 2px;
 	font-weight: bold;
@@ -278,18 +271,16 @@ input:hover {
 }
 
 .apply-button:hover {
-	// display: none;
-	background-color: $light-blue-grey;
+	background-color: $focus;
+	// text-decoration: none;
 }
 
 #points-gui1 {
 	float: left;
-	// background-color: yellow;
 }
 
 #points-gui2 {
 	float: left;
-	// background-color: red;
 }
 
 .pgui {
@@ -299,29 +290,28 @@ input:hover {
 }
 
 #points-button-container {
-	// border: 2px solid red;
 	position: absolute;
-	bottom: 23px;
+	bottom: 18px;
 	left: 15px;
 }
 
 #points-customizer button{
-	margin-right: 20px;
+	margin-right: 10px;
 	color: $burnt-orange;
-	font-size: 12px;
+	font-size: 13px;
 	font-family: 'Inconsolata';
 	font-weight: bold;
 	padding: 2px;
-	border: 1px solid $light-blue-grey;
+	// border: 1px solid $light-blue-grey;
 	background-color: $dark-grey;
 	z-index: 100;
 	cursor: pointer;
 	border-radius: 1px;
+	// text-decoration: underline;
 }
 
-
 #points-customizer button:hover {
-	background-color: $light-blue-grey;
+	background-color: $focus;
 }
 
 #points-customizer .dg.main.a{
@@ -334,5 +324,82 @@ input:hover {
 }
 
 #points-edit {
+	position: fixed;
 	display: none;
+	width: 500px;
+	background-color: $dark-grey;
+	height: 100%;
+	z-index: 99;
+	font-size: 13px;
+
+	p {
+		margin-top: 5px;
+	}
+
+	div {
+		margin-top: 60px;
+	}
+
+	#points-delete-buttons {
+		float: right;
+		margin-right: 15px;
+		height: 100%;
+		width: 50px;
+		// border: 1px solid red;
+		padding-top: 2px;
+
+		button {
+			font-size: 13px;
+			margin-top: 1px;
+			background-color: $dark-grey;
+			color: $burnt-orange;
+			font-family: 'Inconsolata';
+			cursor: pointer;
+			padding: 2px;
+			box-shadow: none;
+
+		}
+
+		button:hover {
+			background-color: $light-blue-grey;
+		}
+	}
+
+	#points-left{
+		width: 190px;
+		// border: 2px solid red;
+		margin-left: 15px;
+		// margin-top: 4px;
+		float: left;
+	}
+
+	#points-right{
+		width: 190px;
+		// border: 2px solid red;
+		margin-left: 15px;
+		float: left;
+	}
+
+	.big {
+		color: $burnt-orange;
+		// text-decoration: underline;
+		font-family: 'Inconsolata';
+		font-weight: bold;
+		font-size: 18px;
+		background-color: $dark-grey;
+		padding: 3px;
+		position: absolute;
+		left: 80px;
+		top: 17px;
+		cursor: pointer;
+		border-radius: 1px;
+	}
+
+	.big:hover{
+		background-color: $focus;
+	}
+}
+
+.points-display {
+	font-size: 12px;
 }

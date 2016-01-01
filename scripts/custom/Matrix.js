@@ -12,20 +12,29 @@ Matrix.rotationMatrix4d = function (axes, theta){
 
 // Rotation functions that produce transformation matrices
 Matrix.rotateXY_4d = function (theta){
-    return this.rotationMatrix4d([0, 1], theta);
+    return Matrix.rotationMatrix4d([0, 1], theta);
 }
 Matrix.rotateYZ_4d = function (theta){
-    return this.rotationMatrix4d([1, 2], theta);
+    return Matrix.rotationMatrix4d([1, 2], theta);
 }
 Matrix.rotateZX_4d = function (theta){
-    return this.rotationMatrix4d([2, 0], theta);
+    return Matrix.rotationMatrix4d([2, 0], theta);
 }
 Matrix.rotateXW_4d = function (theta){
-    return this.rotationMatrix4d([0, 3], theta);
+    return Matrix.rotationMatrix4d([0, 3], theta);
 }
 Matrix.rotateWY_4d = function (theta){
-    return this.rotationMatrix4d([3, 1], theta);
+    return Matrix.rotationMatrix4d([3, 1], theta);
 }
 Matrix.rotateWZ_4d = function (theta){
-    return this.rotationMatrix4d([3, 2], theta);
+    return Matrix.rotationMatrix4d([3, 2], theta);
+}
+
+Matrix.rs = {
+	xy: Matrix.rotateXY_4d,
+	yz: Matrix.rotateYZ_4d,
+	zx: Matrix.rotateZX_4d,
+	xw: Matrix.rotateXW_4d,
+	wy: Matrix.rotateWY_4d,
+	wz: Matrix.rotateWZ_4d
 }

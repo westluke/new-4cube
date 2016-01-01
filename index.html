@@ -24,10 +24,17 @@ Start box not taking up all of screen, so doesn't actually cover.-->
 	</head>
 	<body scroll="no">
 
+		<div id = "settings-wrapper">
+		<div id="points-edit">
+			<button onclick="Settings.returnToSettings()" class="big">< Settings</button>
+
+			<div id="points-left"></div>
+			<div id="points-right"></div>
+			<div id="points-delete-buttons"></div>
+		</div>
+
 		<div id="settings">
-			<div id="points-edit">
-				<button onclick="Settings.returnToSettings()"><</button>
-			</div>
+
 			<div id="manual-control" class="gui-container">
 				<h2>
 					Manual rotations
@@ -67,14 +74,15 @@ Start box not taking up all of screen, so doesn't actually cover.-->
 				<div id="points-gui2" class="pgui">
 				</div>
 				<div id="points-button-container">
-					<button>Plot</button>
-					<button>Clear all</button>
+					<button id="plot-button">Plot</button>
+					<button id="clear-button">Clear all</button>
 					<button onclick="Settings.displayPoints()">Edit current points</button>
 				</div>
 				<div style="clear: both"></div>
 				<!-- <div style="clear: both" class="border-div"></div> -->
 			</div>
 		</div>
+	</div>
 
 		<h1 id = "title">
 			4Shadow.io
@@ -94,11 +102,13 @@ Start box not taking up all of screen, so doesn't actually cover.-->
 					Reset
 				</h1>
 			</button>
-			<button class="button" id="help-button">
-				<h1>
-					<a href="help.html">Help / About</a>
-				</h1>
-			</button>
+			<a href="help.html">
+				<button class="button" id="help-button">
+					<h1>
+						 Help / About
+					</h1>
+				</button>
+			</a>
 		</div>
 	</body>
 </html>

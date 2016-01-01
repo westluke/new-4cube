@@ -13,7 +13,7 @@ body {
   width: 100%;
   background-color: #2B3133;
   font-family: 'Inconsolata';
-  color: #ED5749; }
+  color: #B6BDBF; }
 
 html {
   margin-left: auto;
@@ -26,7 +26,7 @@ html {
   border: none; }
 
 #content-container {
-  font-size: 16px;
+  font-size: 18px;
   margin-top: 30px;
   padding-bottom: 100px; }
   #content-container h1 {
@@ -49,14 +49,11 @@ html {
   .button h1 {
     display: block;
     font-size: 18px;
-    font-family: 'Inconsolata'; }
-  .button a {
-    color: #ED5749;
+    font-family: 'Inconsolata';
+    color: #B6BDBF;
     text-decoration: none; }
-  .button :focus {
-    background-color: #75797A; }
 
 .button:hover {
-  background-color: #B6BDBF; }
+  background-color: #5c5e66; }
 
 /*# sourceMappingURL=help.css.map */

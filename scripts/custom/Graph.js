@@ -1,9 +1,30 @@
+// console.log((new THREE.Vector4(0, 0, 0, 0)).copy())
 var Graph = new Object();
+
+// Graph.rotations = {xy: 0, yz: 0, zx: 0, xw: 0, wy: 0, wz: 0};
+
+//TODO: fix this shit
+Graph.rotations = {xw: Matrix.rs["xw"](0.003)};
+
+Graph.produceCurrentRotation = function() {
+	console.log("new rotation");
+	var ret = (new THREE.Matrix4()).identity();
+	var keys = ["xy", "yz", "zx", "xw", "wy", "wz"];
+
+	for (var i in keys){
+		console.log(keys[i]);
+		if (Graph.rotations[keys[i]]){
+			ret.multiply(Graph.rotations[keys[i]]);
+		}
+	}
+	this.current_rotation = ret;
+}
 
 // The initial set of lines that will be used to build the real array of vector lines
 // and the array of vector points. Never used again.
 Graph.array_lines = [
 [ [0,0,0,0], [0,0,0,1] ],
+// [ [1.234, 3.3245, 1.12311, 4.123], [1.234, 3.3245, 1.12311, 4.123]],
 [ [0,0,0,0], [0,0,1,0] ],
 [ [0,0,0,0], [0,1,0,0] ],
 [ [0,0,0,0], [1,0,0,0] ],
@@ -62,6 +83,16 @@ Graph.transformVectors = function(points, transformation){
 	for (index in points){
 		points[index].applyMatrix4(transformation);
 	}
+}
+
+Graph.copyVectorLines = function(lines){
+	ret = [];
+	// console.log((new THREE.Vector4(0, 0, 0, 0)).copy());
+	for (var i in lines){
+		// console.log(lines[i][0].copy());
+		ret.push([lines[i][0].clone(), lines[i][1].clone()]);
+	}
+	return ret;
 }
 
 /*
@@ -204,16 +235,10 @@ Graph.init = function(  options,				// parameters for the display of the graph
 
     this.matrix_rotate_distance = matrix_rotate_distance;
     this.options = options;
-    this.rotations = {  xy: Matrix.rotateXY_4d(matrix_rotate_distance),
-                        yz: Matrix.rotateYZ_4d(matrix_rotate_distance),
-                        zx: Matrix.rotateZX_4d(matrix_rotate_distance),
-                        xw: Matrix.rotateXW_4d(matrix_rotate_distance),
-                        wy: Matrix.rotateWY_4d(matrix_rotate_distance),
-                        wz: Matrix.rotateWZ_4d(matrix_rotate_distance)}
 
 	// The rotation that the animate() function will use on the graph. xw is the most impressive.
 	// this.current_rotation = this.rotations.xw;
-	this.current_rotation = this.rotations.xw.multiply(this.rotations.wy).multiply(this.rotations.wz).multiply(this.rotations.xy).multiply(this.rotations.yz).multiply(this.rotations.zx);
+	this.current_rotation = Matrix.rs.xw(this.matrix_rotate_distance);
 
 	// Rendering and animation must be started by onload.js.
 	this.stop_render = true;
@@ -265,6 +290,7 @@ Should be independent of the changing of the graph, this is just the drawing of 
 Graph.renderLoop = function() {
 	if (!Graph.stop_animate){
 		if (Graph.animate_count % Graph.options.animate_wait == 0){
+			Graph.transformVectors(Graph.points, Graph.current_rotation);
 			Graph.animate();
 			Graph.animate_count = 0;
 		}
@@ -317,7 +343,8 @@ It then goes through every mesh. If the mesh is a sphere, it just updates its po
 If it is an extrusion, it is given a new geometry with the transformed perspective line.
 */
 Graph.animate = function(options) {
-	this.transformVectors(this.points, this.current_rotation);
+	// this.transformVectors(this.points, this.current_rotation);
+	// console.log(this.perspective_lines);
 	this.perspectify(this.points, this.perspective_points);
 	var points_index = 0;
 	var lines_index = 0;
@@ -332,6 +359,8 @@ Graph.animate = function(options) {
 			// Can't just assign the new geometry, that keeps a reference to the original somewhere,
 			// causing a memory leak.
 			this.meshes[index].geometry.dispose();
+
+			// console.log("FUCK " + lines_index);
 
 			this.meshes[index].geometry = new THREE.ExtrudeGeometry(
 				new THREE.Shape(
@@ -382,6 +411,7 @@ Graph.plot = function(lines, points){
 		sphere_mesh.position.set(points[index].x, points[index].y, points[index].z)		// Have to set the actual position with spheres.
 		sphere_mesh.geometry.verticesNeedUpdate = false;
 		sphere_mesh.frustumCulled = false;
+		// sphere_mesh.material.wireframe = true;
 
 		this.scene.add(sphere_mesh);
 		this.meshes.push(sphere_mesh);
@@ -423,6 +453,8 @@ Graph.initLines = function() {
 	this.lines = this.arrayToVectors(this.array_lines);
 	this.points = this.aliasVectorLinesToPoints(this.lines);
 	this.center(this.points);
+	this.initial_lines = this.copyVectorLines(this.lines);
+	console.log(this.initial_lines);
 
 	// Does the same thing as above, but then perspectifies them. These are the points that will actually
 	// be used in graphing.
@@ -435,4 +467,15 @@ Graph.reset = function() {
 	this.clear();
 	this.meshes = [];
 	this.initLines();
+}
+
+Graph.clearMeshesOnly = function() {
+	for (index in this.meshes){
+		this.scene.remove(this.meshes[index]);
+		this.meshes[index].geometry.dispose();
+		this.meshes[index].material.dispose();
+		// this.meshes[index].dispose();
+		this.meshes[index] = null;
+	}
+	this.meshes = [];
 }

@@ -3,6 +3,7 @@ $light-blue-grey: #B6BDBF;
 $burnt-orange: #ED5749;
 $dark-burnt-orange: #BE463A;
 $focused-grey: #75797A;
+$focus: #5c5e66;
 
 @media screen and (max-width: 980px) {
     html {
@@ -30,7 +31,7 @@ body {
 	width: 100%;
 	background-color: $dark-grey;
 	font-family: 'Inconsolata';
-	color: $burnt-orange;
+	color: $light-blue-grey;
 	// border: none;
 }
 
@@ -61,7 +62,7 @@ html {
 		}
 	}
 
-	font-size: 16px;
+	font-size: 18px;
 	margin-top: 30px;
 	padding-bottom: 100px;
 }
@@ -71,12 +72,11 @@ html {
 		display: block;
 		font-size: 18px;
 		font-family: 'Inconsolata';
-	}
-
-	a {
-		color: $burnt-orange;
+		color: $light-blue-grey;
 		text-decoration: none;
 	}
+
+
 
 	// position: relative;
 	// right: 50px;
@@ -90,11 +90,11 @@ html {
 	z-index: 1;
 	cursor: pointer;
 
-	:focus {
-		background-color: $focused-grey;
-	}
+	// :focus {
+	// 	background-color: $focus;
+	// }
 }
 
 .button:hover {
-	background-color: $light-blue-grey;
+	background-color: $focus;
 }
