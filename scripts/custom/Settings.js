@@ -161,6 +161,7 @@ Settings.init = function() {
 	});
 
 	this.guis = [gui, animate_gui, geo_gui, points_gui1, points_gui2];
+	this.updateAllDisplays();
 
 	// for (index in this.guis){
 	// 	this.fixDisplay(this.guis[index]);
