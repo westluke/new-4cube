@@ -337,7 +337,7 @@ and updates the curret meshes accordingly.
 */
 Graph.animate = function() {
 	this.transformVectors(this.points, this.current_rotation);
-	this.center(this.points);
+	// this.center(this.points);
 	this.perspectify(this.points, this.perspective_points);
 	this.updateMeshes(this.perspective_points, this.perspective_lines);
 }
