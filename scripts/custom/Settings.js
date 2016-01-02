@@ -61,7 +61,6 @@ Settings.init = function() {
 	animate_gui.__controllers[6].onChange(function() {
 		Graph.options.animate_wait = Settings.animate_keep["skipped renders"] + 1;
 		this.updateDisplay();
-		// console.log("hello fuck");
 		// console.log(Graph.options.animate_wait);
 	});
 	//
@@ -147,9 +146,11 @@ Settings.init = function() {
 		Graph.lines.push([v1, v2]);
 		Graph.points = Graph.aliasVectorLinesToPoints(Graph.lines);
 		Graph.clearMeshes();
+		Graph.plane = Graph.calculateNewProjection(Graph.points);
+		console.log(Graph.plane);
 		Graph.perspective_lines = Graph.copyVectorLines(Graph.lines);
 		Graph.perspective_points = Graph.aliasVectorLinesToPoints(Graph.perspective_lines);
-		Graph.perspectify(Graph.points, Graph.perspective_points)
+		Graph.perspectify(Graph.points, Graph.perspective_points, Graph.plane)
 		Graph.plot(Graph.perspective_lines, Graph.perspective_points);
 		Settings.displayLines(Graph.lines);
 	});
@@ -299,9 +300,11 @@ Settings.removeFromList = function(index) {
 	$("#points-edit-containers").empty();
 	if (!$.isEmptyObject(Graph.lines[0])){
 		Graph.points = Graph.aliasVectorLinesToPoints(Graph.lines);
+		Graph.plane = Graph.calculateNewProjection(Graph.points);
+
 		Graph.perspective_lines = Graph.copyVectorLines(Graph.lines);
 		Graph.perspective_points = Graph.aliasVectorLinesToPoints(Graph.perspective_lines);
-		Graph.perspectify(Graph.points, Graph.perspective_points);
+		Graph.perspectify(Graph.points, Graph.perspective_points, Graph.plane);
 		// console.log(Graph.points);
 		// console.log(Graph.meshes);
 		Graph.plot(Graph.perspective_lines, Graph.perspective_points);

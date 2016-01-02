@@ -24,7 +24,6 @@ Graph.produceCurrentRotation = function() {
 // and the array of vector points. Never used again.
 Graph.array_lines = [
 [ [0,0,0,0], [0,0,0,1] ],
-// [ [1.234, 3.3245, 1.12311, 4.123], [1.234, 3.3245, 1.12311, 4.123]],
 [ [0,0,0,0], [0,0,1,0] ],
 [ [0,0,0,0], [0,1,0,0] ],
 [ [0,0,0,0], [1,0,0,0] ],
@@ -145,30 +144,46 @@ Graph.aliasVectorLinesToPoints = function(vector_lines){
 	return vector_points;
 }
 
+Graph.calculateNewProjection = function(points){
+	var max_length = points[0].length();
+	// console.log(points);
+	// console.log(min_length);
+	for (var index in points){
+		if (points[index].length() > max_length){
+			max_length = points[index].length();
+			// console
+		}
+	}
+	// console.log(min_length);
+	// if (min_length <= 0.2){
+	// 	min_length = 1;
+	// }
+	return max_length;
+}
+
 /*
 Uses the w-dimensions of the vectors in points to scale down their x, y, and z-dimensions.
 It copies those dimensions into the vectors in perspective_points without changing the vectors in points.
+WWRRROOOONNNG
 */
-Graph.perspectify = function (points, perspective_points){
-	var min_w = points[0].w;
-	var vector_w = 0;
+Graph.perspectify = function (points, perspective_points, plane){
+	// var cop = 2;
+	// var plane = 1;
+	// // var min_w = points[0].w;
+	// // var vector_w = 0;
 	var coord_array;
 	var x; var y; var z; var w;
 	var divisor;
+	// //
+	// // Find the lowest w-value.
+	// for (var index in points){
+	// 	vector_w = points[index].w;
+	//
+	// 	if (vector_w < min_w){
+	// 		min_w = vector_w;
+	// 	}
+	// }
 
-	// Find the lowest w-value.
-	for (var index in points){
-		vector_w = points[index].w;
-
-		if (vector_w < min_w){
-			min_w = vector_w;
-		}
-	}
-
-	// For this to work, we have to pretend that the point with the lowest w-value has
-	// actually been moved to touch the space w = 1. This means that all the points have
-	// to be moved by w_move.
-	var w_move = 1 - min_w;
 
 	for (var index in points){
 		coord_array = points[index].toArray();
@@ -176,10 +191,17 @@ Graph.perspectify = function (points, perspective_points){
 		y = coord_array[1];
 		z = coord_array[2];
 		w = coord_array[3];
-		divisor = w + w_move;
+		divisor = (2 * plane - w) / plane;
+		// w = Math.abs(coord_array[3]) + 1;
+		// divisor = w + w_move;
+
+		// w=points[index].w; //uncertain
+		// console.log(plane);
 
 		// To project onto the space w = 1, x, y, and z are divided by the w-value of the moved points.
-		perspective_points[index].set(x/divisor, y/divisor, z/divisor, 1);
+		// perspective_points[index].set(x/divisor, y/divisor, z/divisor, 1);
+		perspective_points[index].set(x/divisor, y/divisor, z/divisor, plane); //uncertain
+		// console.log(perspective_points[index]);
 	}
 }
 
@@ -241,6 +263,7 @@ Graph.init = function(  options,				// parameters for the display of the graph
 
 	this.rotations = {xw: Matrix.rs.xw(starting_rotate_distance)};
 	this.initLines();
+
 	this.animate_count = 0;
 	this.camera_coordinates = camera_coordinates;
 
@@ -278,6 +301,13 @@ Graph.init = function(  options,				// parameters for the display of the graph
 	// For shading
     this.light = new THREE.PointLight(0xffffff);
 	this.scene.add(this.light);
+
+	// var test = new THREE.Mesh(
+	// 			new THREE.SphereGeometry(0.1, 8, 8),
+	// 			new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe: false})		// We need Phong because Lambert won't do flat shading.
+	// 	)
+	// test.position.set(0, 0, 0);
+	// this.scene.add(test);
 }
 
 /*
@@ -338,7 +368,7 @@ and updates the curret meshes accordingly.
 Graph.animate = function() {
 	this.transformVectors(this.points, this.current_rotation);
 	// this.center(this.points);
-	this.perspectify(this.points, this.perspective_points);
+	this.perspectify(this.points, this.perspective_points, this.plane);
 	this.updateMeshes(this.perspective_points, this.perspective_lines);
 }
 
@@ -459,13 +489,16 @@ Graph.initLines = function() {
 	this.lines = this.arrayToVectors(this.array_lines);
 	this.points = this.aliasVectorLinesToPoints(this.lines);
 	this.center(this.points);
+
+	this.plane = this.calculateNewProjection(this.points);
 	// this.lines[0] = [new THREE.Vector4(1, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)];
 
 	// Does the same thing as above, but then perspectifies them. These are the points that will actually
 	// be used in graphing.
 	this.perspective_lines = this.copyVectorLines(this.lines);
 	this.perspective_points = this.aliasVectorLinesToPoints(this.perspective_lines);
-	this.perspectify(this.points, this.perspective_points);
+	this.perspectify(this.points, this.perspective_points, this.plane);
+	// console.log(this.perspective_points);
 }
 
 Graph.reset = function() {

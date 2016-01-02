@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	console.log(Matrix.rs.xw(3.14));
+	// console.log(Matrix.rs.xw(3.14));
     graph_options = {
 		color: 15554377,
 		wireframe: false,
@@ -28,6 +28,7 @@ $(document).ready(function() {
 
 	// console.log("ONLOAD " , Graph.animating, " ", Graph.rendering);
 	Graph.startRenderAndAnimate();
+	// Graph.startRender();
 	// console.log("ONLOAD TWO" , Graph.animating, " ", Graph.rendering);
 
     $("#menu-icon").click(function() {
