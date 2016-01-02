@@ -96,7 +96,7 @@ Settings.init = function() {
 				radius: Settings.geo_keep.radius,
 				sphere_segments: Settings.geo_keep["sphere segments"],
 				extrude_segments: Settings.geo_keep["tube segments"],
-				animate_wait: 2
+				animate_wait: Settings.animate_keep["skipped renders"] + 1
 			}
 
 			Graph.plot(Graph.lines, Graph.points);

@@ -25,11 +25,20 @@ Start box not taking up all of screen, so doesn't actually cover.-->
 	<body scroll="no">
 
 		<noscript>
-			<div id="noscript-cover">
+			<div class="cover">
 				<p>Hello there! This site requires javascript to function, but it looks like
 					you've disabled javascript on your browser. To view the site, enable it and refresh the page.
 				</p></div>
 		</noscript>
+
+		<div style="display: none" id="nowebgl">
+			<div class="cover">
+				<p>Hello there! This site requires webgl to function, but it looks like
+					it's been disabled on your browser. To view the site, enable it and refresh the page.
+				</p>
+			</div>
+		</div>
+
 
 		<div id = "settings-wrapper">
 		<div id="points-edit">

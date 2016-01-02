@@ -1,4 +1,4 @@
-noscript {
+noscript, #nowebgl {
   font-family: 'Inconsolata', monospace;
   color: #ED5749;
   font-size: 20px;
@@ -7,7 +7,7 @@ noscript {
   height: 100%;
   overflow: visible;
   z-index: 201; }
-  noscript div {
+  noscript div, #nowebgl div {
     position: fixed;
     top: -300px;
     left: -300px;
@@ -15,7 +15,7 @@ noscript {
     height: calc(100% + 1000px);
     z-index: 200;
     background-color: #B6BDBF; }
-  noscript p {
+  noscript p, #nowebgl p {
     position: fixed;
     top: 50px;
     left: 50px;
