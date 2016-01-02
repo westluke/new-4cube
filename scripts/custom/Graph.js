@@ -273,6 +273,7 @@ Graph.init = function(  options,				// parameters for the display of the graph
 	// The rotation that the animate() function will use on the graph. xw is the most impressive.
 	// this.current_rotation = this.rotations.xw;
 	this.current_rotation = Matrix.rs.xw(starting_rotate_distance);
+	this.starting_rotate_distance = starting_rotate_distance;
 
 	// Rendering and animation must be started by onload.js.
 	this.rendering = false;

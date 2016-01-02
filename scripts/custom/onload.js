@@ -6,10 +6,10 @@ $(document).ready(function() {
 		radius: 0.03,
 		sphere_segments: 8,		// How many segments in the corner spheres
 		extrude_segments: 20,	// How many vertices on the extrusions shape
-		animate_wait: 2			// How many frames to skip (+1) before animating
+		animate_wait: 1			// How many frames to skip (+1) before animating
 	};
 
-    var starting_rotate_distance = 0.003;
+    var starting_rotate_distance = 0.006;
     var camera_coordinates = [0, 0, 2];
 
     var camera_args = {

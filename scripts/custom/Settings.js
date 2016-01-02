@@ -31,10 +31,10 @@ Settings.init = function() {
 		this.xy = 0.1;
 		this.yz = 0.1;
 		this.zx = 0.1;
-		this.xw = 0.003 * 60;
+		this.xw = Graph.starting_rotate_distance * 60;
 		this.wy = 0.1;
 		this.wz = 0.1;
-		this["skipped renders"] = 1;
+		this["skipped renders"] = 0;
 	}
 
 	this.animate_keep = new AnimateKeep();
@@ -265,7 +265,7 @@ Settings.resetGUI = function() {
 	for (var prop in this.animate_keep){
 		this.animate_keep[prop] = 0.0;
 	}
-	this.animate_keep["skipped renders"] = 1;
+	this.animate_keep["skipped renders"] = 0;
 
 	this.geo_keep.color = [237, 87, 73];
 	this.geo_keep.wireframe = false;
