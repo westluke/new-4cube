@@ -1,15 +1,10 @@
 <!DOCTYPE html>
-<!--Don't use sidr, slow, don't want to push away rest of screen. Don't use any animations, just make settings bar appear. Button to hide / show shouldn't move.-->
-<!--Don't cover box though. How should it be done? Can instantly push box to right, update animations with javascript. No, just cover box if necessary.
-Start box not taking up all of screen, so doesn't actually cover.-->
-<!--Need re-render function to draw again with updated parameters.-->
-
 <html>
 	<head>
 		<link rel="stylesheet" href="stylesheets/css/index.css">
 		<link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
-		<!-- <script src="scripts/jquery-1.11.3.min.js"></script>
+		<script src="scripts/jquery-1.11.3.min.js"></script>
 		<script src="scripts/mrdoob-three.js-1f968fe/build/three.js"></script>
 		<script src="scripts/TrackballControls.js"></script>
 		<script src="scripts/dat-gui/build/dat.gui.js"></script>
@@ -17,9 +12,9 @@ Start box not taking up all of screen, so doesn't actually cover.-->
 		<script src="scripts/custom/Matrix.js"></script>
 		<script src="scripts/custom/Graph.js"></script>
 		<script src="scripts/custom/onload.js"></script>
-		<script src="scripts/custom/Settings.js"></script> -->
+		<script src="scripts/custom/Settings.js"></script>
 
-		<script src="scripts/minified2.js"></script>
+		<!-- <script src="scripts/minified2.js"></script> -->
 
 		<link rel="icon" type="image/png" href = "assets/favicon (4).ico"
 	</head>
@@ -41,85 +36,104 @@ Start box not taking up all of screen, so doesn't actually cover.-->
 		</div>
 
 
+		<!-- Contains the main settings and the point-editing settings. The points are initially hidden. -->
 		<div id = "settings-wrapper">
-		<div id="points-edit">
-			<button onclick="Settings.returnToSettings()" class="big">< Settings</button>
-			<div id = "points-edit-containers"></div>
 
-			<!-- <div id="points-left"></div>
-			<div id="points-right"></div>
-			<div id="points-delete-buttons"></div> -->
-		</div>
+			<!-- This one starts out hidden. -->
+			<div id="points-edit">
+				<button onclick="Settings.returnToSettings()" class="big">< Settings</button>
 
-		<div id="settings">
-
-			<div id="manual-control" class="gui-container">
-				<h2>
-					Manual rotations
-				</h2>
-				<!-- Have to give it a special div, otherwise it goes after the clearing div. -->
-				<div id = "manual-gui">
-				</div>
-
-				<!-- Forces the containing div to actually get the correct height, and not collapse to the h2. -->
-				<div style="clear: both" class="border-div"></div>
+				<!-- Contains the list of all the currently plotted points, with buttons to remove them. -->
+				<div id = "points-edit-containers"></div>
 			</div>
 
-			<div id="animation-control" class="gui-container">
-				<h2>
-					Animation control
-				</h2>
-				<div id="animation-gui">
-				</div>
-				<div style="clear: both" class="border-div"></div>
-			</div>
+			<div id="settings">
 
-			<div id="geometries-control" class="gui-container">
-				<h2>
-					Geometry control
-				</h2>
-				<div id="geometry-gui">
-				</div>
-				<div style="clear: both" class="border-div"></div>
-			</div>
+				<!-- Contains the gui to manually and statically rotate the graph. -->
+				<div id="manual-control" class="gui-container">
+					<h2>
+						Manual rotations
+					</h2>
 
-			<div id="points-customizer" class="gui-container">
-				<h2>
-					Points customizer
-				</h2>
-				<div id="points-gui1" class="pgui">
+					<!-- Have to give it a special div, otherwise it goes after the clearing div. -->
+					<div id = "manual-gui">
+					</div>
+
+					<!-- Forces the containing div to actually get the correct height, and not collapse to the h2. -->
+					<div style="clear: both" class="border-div"></div>
 				</div>
-				<div id="points-gui2" class="pgui">
+
+				<!-- Contains the gui to control the running animation of the graph. -->
+				<div id="animation-control" class="gui-container">
+					<h2>
+						Animation control
+					</h2>
+					<div id="animation-gui">
+					</div>
+					<div style="clear: both" class="border-div"></div>
 				</div>
-				<div id="points-button-container">
-					<button id="plot-button">Plot</button>
-					<button id="clear-button">Clear all</button>
-					<button onclick="Settings.displayPoints()">Edit current points</button>
+
+				<!-- Contains the gui to control how the graph is displayed, and what geometries are used. -->
+				<div id="geometries-control" class="gui-container">
+					<h2>
+						Geometry control
+					</h2>
+					<div id="geometry-gui">
+					</div>
+					<div style="clear: both" class="border-div"></div>
 				</div>
-				<div style="clear: both"></div>
-				<!-- <div style="clear: both" class="border-div"></div> -->
+
+				<!-- Contains the gui in the main settings container to add, clear, or edit the points. -->
+				<!-- The editing button hides the main settings container and reveals the points-edit-container -->
+				<div id="points-customizer" class="gui-container">
+					<h2>
+						Points customizer
+					</h2>
+
+					<div id="points-gui1" class="pgui">
+					</div>
+					<div id="points-gui2" class="pgui">
+					</div>
+
+					<div id="points-button-container">
+						<button id="plot-button">Plot</button>
+						<button id="clear-button">Clear all</button>
+						<button onclick="Settings.displayPoints()">Edit current points</button>
+					</div>
+
+					<div style="clear: both"></div>
+				</div>
 			</div>
-		</div>
 	</div>
 
+		<!-- The title that displays at the top right. -->
 		<h1 id = "title">
 			4Shadow.io
 		</h1>
 
+		<!-- The icon for the settings bar -->
 		<a>
 			<img src="assets/settings.png" id="menu-icon"></img>
 		</a>
 
+		<!-- The div that actually contains the graph. Lies behind the settings div. -->
 		<div id="graph-container">
+
+			<!-- Stops the graph from being updated by the animations -->
 			<button class="button" id="animate-button">
 				<h1>
 					Stop animation
 				</h1>
+			</button>
+
+			<!-- Resets the graph back to the starting position, with no animations. -->
 			<button class="button" id="reset-button">
 				<h1>
 					Reset
 				</h1>
 			</button>
+
+			<!-- Takes the user to the help page. -->
 			<a href="help.html">
 				<button class="button" id="help-button">
 					<h1>

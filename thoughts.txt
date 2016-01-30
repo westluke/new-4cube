@@ -129,3 +129,9 @@ ALSO MORE ISOLATION, MODIFYING GRAPH VARIABLES DIRECTLY IS BAD
 YEP, the slowdown is definitely coming from restarting the renderloop. I think its causing multiple copies to run at the same time.
 
 SO: NEVER EVER stop animateandrender and then immediately start again. If there is no delay, two different function loops will be started, and cause a memory leak.
+
+THE PERSPECTIVE PROJECTION IS WRONG
+it doesn't make any sense to shift the whole thing over, that means the addition of one new point causes all the others to change.
+Projection should be onto space w=1 with center of projection at origin, yes, but the space should never move, and neither should the object.
+just divide by w-distance from plane. If the object's w is greater than 0, divide by w.
+if less,

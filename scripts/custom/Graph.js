@@ -56,13 +56,6 @@ Graph.array_lines = [
 [ [1,1,1,0], [1,1,0,0] ],
 [ [1,1,0,0], [1,1,0,1] ] ];
 
-// for (var i in Graph.array_lines){
-// 	for (var j in Graph.array_lines[i][0]){
-// 		Graph.array_lines[i][0][j] *= 0.2;
-// 		Graph.array_lines[i][1][j] *= 0.2;
-// 	}
-// }
-
 // This is where the graphed meshes will be stored to be updated in animate().
 Graph.meshes = [];
 
@@ -144,64 +137,43 @@ Graph.aliasVectorLinesToPoints = function(vector_lines){
 	return vector_points;
 }
 
+// Finds the new farthest distance from the origin in a group of points, used to
+// update the projection and keep the graph from becoming really weird when points
+// are too close to the cameera plane
 Graph.calculateNewProjection = function(points){
 	var max_length = points[0].length();
-	// console.log(points);
-	// console.log(min_length);
+
 	for (var index in points){
 		if (points[index].length() > max_length){
 			max_length = points[index].length();
 			// console
 		}
 	}
-	// console.log(min_length);
-	// if (min_length <= 0.2){
-	// 	min_length = 1;
-	// }
+
 	return max_length;
 }
 
 /*
 Uses the w-dimensions of the vectors in points to scale down their x, y, and z-dimensions.
 It copies those dimensions into the vectors in perspective_points without changing the vectors in points.
-WWRRROOOONNNG
+The plane must always be at or beyond the farthest point, and the center of projection is 2x farther than the plane.
+Otherwise, when points are between the plane and the center, weird things happen.
 */
 Graph.perspectify = function (points, perspective_points, plane){
-	// var cop = 2;
-	// var plane = 1;
-	// // var min_w = points[0].w;
-	// // var vector_w = 0;
 	var coord_array;
 	var x; var y; var z; var w;
 	var divisor;
-	// //
-	// // Find the lowest w-value.
-	// for (var index in points){
-	// 	vector_w = points[index].w;
-	//
-	// 	if (vector_w < min_w){
-	// 		min_w = vector_w;
-	// 	}
-	// }
-
 
 	for (var index in points){
 		coord_array = points[index].toArray();
+
 		x = coord_array[0];
 		y = coord_array[1];
 		z = coord_array[2];
 		w = coord_array[3];
+
 		divisor = (2 * plane - w) / plane;
-		// w = Math.abs(coord_array[3]) + 1;
-		// divisor = w + w_move;
-
-		// w=points[index].w; //uncertain
-		// console.log(plane);
-
-		// To project onto the space w = 1, x, y, and z are divided by the w-value of the moved points.
-		// perspective_points[index].set(x/divisor, y/divisor, z/divisor, 1);
-		perspective_points[index].set(x/divisor, y/divisor, z/divisor, plane); //uncertain
-		// console.log(perspective_points[index]);
+		perspective_points[index].set(x/divisor, y/divisor, z/divisor, plane);
 	}
 }
 
@@ -302,13 +274,6 @@ Graph.init = function(  options,				// parameters for the display of the graph
 	// For shading
     this.light = new THREE.PointLight(0xffffff);
 	this.scene.add(this.light);
-
-	// var test = new THREE.Mesh(
-	// 			new THREE.SphereGeometry(0.1, 8, 8),
-	// 			new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe: false})		// We need Phong because Lambert won't do flat shading.
-	// 	)
-	// test.position.set(0, 0, 0);
-	// this.scene.add(test);
 }
 
 /*
@@ -329,10 +294,17 @@ when called in requestAnimationFrame.
 
 Should be independent of the changing of the graph, this is just the drawing of it.
 */
+
+Graph.point_count = 0;
+
 Graph.renderLoop = function() {
+	Graph.point_count++;
+	if (Graph.point_count % 20 == 0){
+		$("#points-edit-containers").empty();
+		Settings.displayLines(Graph.lines);
+		Graph.point_count = 0;
+	}
 	// Only animate if there is something to animate on
-	// console.log("RENDERLOOP ", Graph.animating, " ", Graph.rendering);
-	// console.log(Graph.lines);
 	if (!$.isEmptyObject(Graph.lines)){
 		if (Graph.animating){
 			if (Graph.animate_count % Graph.options.animate_wait == 0){
@@ -348,8 +320,6 @@ Graph.renderLoop = function() {
         Graph.render();
     }
 }
-
-//test
 
 /*
 Contains everything that should happen in one single drawing of the image.
@@ -368,7 +338,6 @@ and updates the curret meshes accordingly.
 */
 Graph.animate = function() {
 	this.transformVectors(this.points, this.current_rotation);
-	// this.center(this.points);
 	this.perspectify(this.points, this.perspective_points, this.plane);
 	this.updateMeshes(this.perspective_points, this.perspective_lines);
 }
@@ -468,7 +437,6 @@ Graph.plot = function(lines, points){
 		sphere_mesh.position.set(points[index].x, points[index].y, points[index].z)		// Have to set the actual position with spheres.
 		sphere_mesh.geometry.verticesNeedUpdate = false;
 		sphere_mesh.frustumCulled = false;
-		// sphere_mesh.material.wireframe = true;
 
 		this.scene.add(sphere_mesh);
 		this.meshes.push(sphere_mesh);
@@ -485,44 +453,33 @@ Graph.initLines = function() {
 		Have to make sure that perspectify is safe, and that it is the only thing that operates
 		on perspective_points.
 	*/
-
+	// points and perspective_points have to be completely parallel,
 	// Creates the 4cube vector lines and points, aliased together, and centered on the origin.
 	this.lines = this.arrayToVectors(this.array_lines);
 	this.points = this.aliasVectorLinesToPoints(this.lines);
 	this.center(this.points);
 
 	this.plane = this.calculateNewProjection(this.points);
-	// this.lines[0] = [new THREE.Vector4(1, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)];
 
 	// Does the same thing as above, but then perspectifies them. These are the points that will actually
 	// be used in graphing.
 	this.perspective_lines = this.copyVectorLines(this.lines);
 	this.perspective_points = this.aliasVectorLinesToPoints(this.perspective_lines);
 	this.perspectify(this.points, this.perspective_points, this.plane);
-	// console.log(this.perspective_points);
 }
 
 Graph.reset = function() {
-	// this.stopRenderAndAnimate();
 	this.clearMeshes();
-	// console.log(this.meshes);
 	this.clearPointsAndLines();
-	// console.log(this.points, this.lines, this.perspective_points, this.perspective_lines);
+
 	this.current_rotation.identity();
 	this.rotations = {};
+
 	this.options = this.initial_options;
 	Settings.resetGUI();
-	// this.camera.position.set(this.camera_coordinates[0], this.camera_coordinates[1], this.camera_coordinates[2]);
+
 	this.initLines();
-	// console.log(this.perspective_lines);
-	// console.log(this.meshes);
 	this.plot(this.perspective_lines, this.perspective_points);
-	console.log("TESTING");
-	// console.log(this.meshes);
-	// console.log(this.meshes);
-	// this.animate();
-	// this.render();
-	// this.startRenderAndAnimate();
 }
 
 Graph.clearMeshes = function() {

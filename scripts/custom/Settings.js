@@ -22,8 +22,6 @@ Settings.init = function() {
 
 	this.keep.xy = this.keep.yz = this.keep.zx = this.keep.xw = this.keep.wy = this.keep.wz = 0.0;
 
-	// this.fixDisplay(gui);
-
 	document.getElementById("manual-gui").appendChild(gui.domElement);
 	$("#manual-control .cr").prepend("<button class='apply-button' onclick='Settings.manualRotate($(this))'>Apply</button> ");
 
@@ -55,17 +53,14 @@ Settings.init = function() {
 			this.updateDisplay();
 			Settings.changeAnimateRotationFromKeyValue(this.property, Settings.animate_keep[this.property]);
 		});
+
 		animate_gui.__controllers[i].updateDisplay();
 	}
 
 	animate_gui.__controllers[6].onChange(function() {
 		Graph.options.animate_wait = Settings.animate_keep["skipped renders"] + 1;
 		this.updateDisplay();
-		// console.log(Graph.options.animate_wait);
 	});
-	//
-	// this.animate_keep["skipped renders"] = 18;
-	// animate_gui.__controllers[6].updateDisplay();
 
 	document.getElementById("animation-gui").appendChild(animate_gui.domElement);
 
@@ -82,9 +77,9 @@ Settings.init = function() {
 
 	geo_gui.addColor(this.geo_keep, "color");
 	geo_gui.add(this.geo_keep, "wireframe");
-	geo_gui.add(this.geo_keep, "radius");
-	geo_gui.add(this.geo_keep, "sphere segments");
-	geo_gui.add(this.geo_keep, "tube segments");
+	geo_gui.add(this.geo_keep, "radius", 0.001, 1);
+	geo_gui.add(this.geo_keep, "sphere segments", 3, 10);
+	geo_gui.add(this.geo_keep, "tube segments", 3, 40);
 
 	for (var i in geo_gui.__controllers){
 		geo_gui.__controllers[i].onChange(function() {
@@ -147,7 +142,7 @@ Settings.init = function() {
 		Graph.points = Graph.aliasVectorLinesToPoints(Graph.lines);
 		Graph.clearMeshes();
 		Graph.plane = Graph.calculateNewProjection(Graph.points);
-		console.log(Graph.plane);
+		// console.log(Graph.plane);
 		Graph.perspective_lines = Graph.copyVectorLines(Graph.lines);
 		Graph.perspective_points = Graph.aliasVectorLinesToPoints(Graph.perspective_lines);
 		Graph.perspectify(Graph.points, Graph.perspective_points, Graph.plane)
@@ -158,17 +153,11 @@ Settings.init = function() {
 	$("#clear-button").click(function() {
 		Graph.clearMeshes();
 		Graph.clearPointsAndLines();
-		$("#points-left, #points-right, #points-delete-buttons").empty();
+		$("#points-edit-containers").empty();
 	});
 
 	this.guis = [gui, animate_gui, geo_gui, points_gui1, points_gui2];
 	this.updateAllDisplays();
-
-	// for (index in this.guis){
-	// 	this.fixDisplay(this.guis[index]);
-	// }
-	//
-	// this.animate_keep["skipped renders"] = 18;
 
 	var sliders = $("#animation-control .slider");
 	sliders.mousedown(function(event) {
@@ -232,13 +221,15 @@ Settings.rgbToHex = function(rgb) {
 
 Settings.displayLines = function(lines){
 	for (var i in lines){
+		// $("#points-edit-containers").append(
+		// 	"<div class='point-row' onclick='Settings.removeFromList(" + i + ")'> <p class='point-left'>" + this.vectorToString(lines[i][0]) + "</p>" +
+		// 	"<p class='point-right'>" + this.vectorToString(lines[i][1]) + "</p>" +
+		// 	"<button onclick='Settings.removeFromList(" + i + ")'>Remove</button></div>"
+		// );
 		$("#points-edit-containers").append(
 			"<div class='point-row' onclick='Settings.removeFromList(" + i + ")'> <p class='point-left'>" + this.vectorToString(lines[i][0]) + "</p>" +
-			"<p class='point-right'>" + this.vectorToString(lines[i][1]) + "</p>" +
-			"<button onclick='Settings.removeFromList(" + i + ")'>Remove</button></div>"
+			"<p class='point-right'>" + this.vectorToString(lines[i][1]) + "&nbsp;&nbsp;&nbsp;Remove</p>"
 		);
-		// $("#points-right").append("<p>" + this.vectorToString(lines[i][1]) + "</p>");
-		// $("#points-delete-buttons").append("<button onclick='Settings.removeFromList(" + i + ")'>Remove</button>")
 	}
 }
 
@@ -262,9 +253,11 @@ Settings.resetGUI = function() {
 	for (var prop in this.keep){
 		this.keep[prop] = 0.0;
 	}
+
 	for (var prop in this.animate_keep){
 		this.animate_keep[prop] = 0.0;
 	}
+
 	this.animate_keep["skipped renders"] = 0;
 
 	this.geo_keep.color = [237, 87, 73];
@@ -285,19 +278,21 @@ Settings.resetGUI = function() {
 }
 
 Settings.removeFromList = function(index) {
+	// TODO can this be more efficient? can rebuild from list instead of resetting everything
+	// Just take out the right points (will be null anyways, right?)
+
 	var newlines = Graph.copyVectorLines(Graph.lines);
 	Graph.clearMeshes();
 	Graph.clearPointsAndLines();
 
-	// console.log(Graph.points);
-	// console.log(Graph.lines);
-
-	// Graph.points = null; Graph.lines = null;
 	newlines.splice(index, 1);
 	Graph.lines = newlines.slice();
-	// console.log(Graph.lines);
-			// Graph.clearMeshesOnly();
+	console.log(newlines);
+
 	$("#points-edit-containers").empty();
+
+	Settings.displayLines(Graph.lines);
+
 	if (!$.isEmptyObject(Graph.lines[0])){
 		Graph.points = Graph.aliasVectorLinesToPoints(Graph.lines);
 		Graph.plane = Graph.calculateNewProjection(Graph.points);
@@ -305,9 +300,7 @@ Settings.removeFromList = function(index) {
 		Graph.perspective_lines = Graph.copyVectorLines(Graph.lines);
 		Graph.perspective_points = Graph.aliasVectorLinesToPoints(Graph.perspective_lines);
 		Graph.perspectify(Graph.points, Graph.perspective_points, Graph.plane);
-		// console.log(Graph.points);
-		// console.log(Graph.meshes);
 		Graph.plot(Graph.perspective_lines, Graph.perspective_points);
-		Settings.displayLines(Graph.lines);
+
 	}
 }
