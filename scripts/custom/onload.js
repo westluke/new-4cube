@@ -115,9 +115,17 @@ $(document).ready(function() {
 	}
 
 	window.onunload = function() {
+		console.log("refresh");
+		Graph.stopRenderAndAnimate();
+		Graph.reset();
+		for (var index in Graph.circles){
+			Graph.circles[index].dispose();
+			Graph.shapes[index] = null;
+			Graph.curves[index] = null;
+		}
 		// TODO
  		//delete all vectors, free all THREE.js objects, delete all main objects
-		Graph.stopRenderAndAnimate();
+		// for
 		Matrix = null;
 		Graph = null;
 		Settings = null;

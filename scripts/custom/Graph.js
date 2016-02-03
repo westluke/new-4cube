@@ -404,8 +404,6 @@ Graph.updateMeshes = function (points, lines) {
 			this.curves[index].v1.copy(lines[lines_index][0]);
 			this.curves[index].v2.copy(lines[lines_index][1]);
 
-			this.meshes[index].geometry.__directGeometry.dispose();
-			this.meshes[index].geometry._bufferGeometry.dispose();
 			this.meshes[index].geometry.dispose();
 
 			this.meshes[index].geometry = new THREE.ExtrudeGeometry(
