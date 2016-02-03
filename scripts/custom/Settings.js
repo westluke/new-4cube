@@ -273,8 +273,8 @@ Settings.resetGUI = function() {
 	this.updateAllDisplays();
 	this.displayLines(Graph.lines);
 
-	console.log(Graph.options.animate_wait);
-	console.log(this.animate_keep["skipped renders"]);
+	// console.log(Graph.options.animate_wait);
+	// console.log(this.animate_keep["skipped renders"]);
 }
 
 Settings.removeFromList = function(index) {

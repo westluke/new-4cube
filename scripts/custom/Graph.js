@@ -290,16 +290,17 @@ Should be independent of the changing of the graph, this is just the drawing of 
 */
 
 Graph.point_count = 0;
+Graph.requestId = null;
 
 Graph.renderLoop = function() {
 	// Graph.point_count++;
 
 	// Maybe change instead of deleting and replacing?
-	// if (Graph.point_count % 20 == 0){
-	// 	$("#points-edit-containers").empty();
-	// 	Settings.displayLines(Graph.lines);
-	// 	Graph.point_count = 0;
-	// }
+	if (Graph.point_count % 20 == 0){
+		$("#points-edit-containers").empty();
+		Settings.displayLines(Graph.lines);
+		Graph.point_count = 0;
+	}
 
 	// Only animate if there is something to animate on
 	if (!$.isEmptyObject(Graph.lines)){
@@ -314,7 +315,7 @@ Graph.renderLoop = function() {
 	}
 
     if (Graph.rendering){
-        requestAnimationFrame(Graph.renderLoop);
+        Graph.requestID = window.requestAnimationFrame(Graph.renderLoop);
         Graph.render();
     }
 }
@@ -365,6 +366,9 @@ Graph.stopAnimate = function() {
 }
 
 Graph.stopRenderAndAnimate = function() {
+	if (this.requestID){
+		window.cancelAnimationFrame(this.requestID);
+	}
 	this.animating = false;
 	this.rendering = false;
 }

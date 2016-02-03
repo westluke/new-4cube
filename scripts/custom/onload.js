@@ -116,16 +116,21 @@ $(document).ready(function() {
 
 	window.onunload = function() {
 		console.log("refresh");
+		$("canvas").remove();
 		Graph.stopRenderAndAnimate();
 		Graph.reset();
+
+		Graph.scene = null;
+		Graph.renderer = null;
+		Graph.light = null;
+		Graph.camera = null;
+
 		for (var index in Graph.circles){
 			Graph.circles[index].dispose();
 			Graph.shapes[index] = null;
 			Graph.curves[index] = null;
 		}
-		// TODO
- 		//delete all vectors, free all THREE.js objects, delete all main objects
-		// for
+
 		Matrix = null;
 		Graph = null;
 		Settings = null;
