@@ -17,6 +17,8 @@ Graph.produceCurrentRotation = function() {
 				this.current_rotation.multiply(Graph.rotations[keys[i]]);
 			}
 		}
+
+		keys = null;
 	}
 }
 
@@ -146,7 +148,6 @@ Graph.calculateNewProjection = function(points){
 	for (var index in points){
 		if (points[index].length() > max_length){
 			max_length = points[index].length();
-			// console
 		}
 	}
 
@@ -158,22 +159,15 @@ Uses the w-dimensions of the vectors in points to scale down their x, y, and z-d
 It copies those dimensions into the vectors in perspective_points without changing the vectors in points.
 The plane must always be at or beyond the farthest point, and the center of projection is 2x farther than the plane.
 Otherwise, when points are between the plane and the center, weird things happen.
+
+Optimized for efficiency I hope
 */
 Graph.perspectify = function (points, perspective_points, plane){
-	var coord_array;
-	var x; var y; var z; var w;
-	var divisor;
-
 	for (var index in points){
-		coord_array = points[index].toArray();
-
-		x = coord_array[0];
-		y = coord_array[1];
-		z = coord_array[2];
-		w = coord_array[3];
-
-		divisor = (2 * plane - w) / plane;
-		perspective_points[index].set(x/divisor, y/divisor, z/divisor, plane);
+		perspective_points[index].set(	points[index].x / (2 - points[index].w / plane),
+										points[index].y / (2 - points[index].w / plane),
+										points[index].z / (2 - points[index].w / plane),
+										plane);
 	}
 }
 
@@ -298,16 +292,20 @@ Should be independent of the changing of the graph, this is just the drawing of 
 Graph.point_count = 0;
 
 Graph.renderLoop = function() {
-	Graph.point_count++;
-	if (Graph.point_count % 20 == 0){
-		$("#points-edit-containers").empty();
-		Settings.displayLines(Graph.lines);
-		Graph.point_count = 0;
-	}
+	// Graph.point_count++;
+
+	// Maybe change instead of deleting and replacing?
+	// if (Graph.point_count % 20 == 0){
+	// 	$("#points-edit-containers").empty();
+	// 	Settings.displayLines(Graph.lines);
+	// 	Graph.point_count = 0;
+	// }
+
 	// Only animate if there is something to animate on
 	if (!$.isEmptyObject(Graph.lines)){
 		if (Graph.animating){
 			if (Graph.animate_count % Graph.options.animate_wait == 0){
+
 				Graph.animate();
 				Graph.animate_count = 0;
 			}
@@ -337,8 +335,10 @@ It transforms the current points andl lines according to the current rotation, t
 and updates the curret meshes accordingly.
 */
 Graph.animate = function() {
+	// These two do not cause any memory leaks.
 	this.transformVectors(this.points, this.current_rotation);
 	this.perspectify(this.points, this.perspective_points, this.plane);
+
 	this.updateMeshes(this.perspective_points, this.perspective_lines);
 }
 
@@ -369,11 +369,17 @@ Graph.stopRenderAndAnimate = function() {
 	this.rendering = false;
 }
 
+// Graph.
 /*
 It then goes through every mesh. If the mesh is a sphere, it just updates its position.
 If it is an extrusion, it is given a new geometry with the transformed perspective line.
 */
+
+
 Graph.updateMeshes = function (points, lines) {
+	// TODO
+	// Store the old shapes and curves to remake the extrudegeometry easier.
+
 	var points_index = 0;
 	var lines_index = 0;
 
@@ -386,15 +392,25 @@ Graph.updateMeshes = function (points, lines) {
 		else {
 			// Can't just assign the new geometry, that keeps a reference to the original somewhere,
 			// causing a memory leak.
+
+			// Also can't just change geometry vertices, as they don't include their 4-dimensional coordinates.
+			// So we have to rebuild from the lines.
+
+			this.circles[index].dispose();
+			this.circles[index] = new THREE.CircleGeometry(this.options.radius, this.options.extrude_segments);
+			this.shapes[index] = null;
+			this.shapes[index] = new THREE.Shape(this.circles[index].vertices.slice(1, this.options.extrude_segments + 1));
+
+			this.curves[index].v1.copy(lines[lines_index][0]);
+			this.curves[index].v2.copy(lines[lines_index][1]);
+
+			this.meshes[index].geometry.__directGeometry.dispose();
+			this.meshes[index].geometry._bufferGeometry.dispose();
 			this.meshes[index].geometry.dispose();
 
 			this.meshes[index].geometry = new THREE.ExtrudeGeometry(
-				new THREE.Shape(
-					(new THREE.CircleGeometry(this.options.radius, this.options.extrude_segments)).vertices.slice(1, this.options.extrude_segments + 1)
-				),
-				{extrudePath: new THREE.LineCurve3(
-					lines[lines_index][0].clone(),
-					lines[lines_index][1].clone())}
+				this.shapes[index],
+				{extrudePath: this.curves[index]}
 			);
 
 			lines_index++;
@@ -407,23 +423,44 @@ Add the lines described in vector_lines to the graph, and store them for future 
 options is of the form {color: ?, shape_segments: ?, sphere_segments: ?, radius: ?}
 Just to be careful, plot should be cloning vectors, not aliasing them into the geometries.
 */
+
+Graph.shapes = [];
+Graph.circles = [];
+Graph.curves = [];
+Graph.ex_geometries = [];
+
 Graph.plot = function(lines, points){
+	// Re-initialize every time to avoid hanging on to objects.
+
+	for (var index in this.curves){
+		this.curves[index] = null;
+		this.shapes[index] = null;
+	}
+	this.curves = [];
+	this.shapes = [];
+
+	for (var index in this.circles){
+		this.circles[index].dispose();
+	}
+	this.circles = [];
+
 	for (var index in lines){
-		// This ungodly mess is to avoid memory leaks at all costs.
+
+		// Three.js objects are pooled for the updateMeshes stage.
+		this.curves[index] = new THREE.LineCurve3(lines[index][0].clone(), lines[index][1].clone());
+		this.circles[index] = new THREE.CircleGeometry(this.options.radius, this.options.extrude_segments);
+		this.shapes[index] = new THREE.Shape(this.circles[index].vertices.slice(1, this.options.extrude_segments + 1));
+
 		var mesh = new THREE.Mesh(
-			new THREE.ExtrudeGeometry(
-				new THREE.Shape(
-					(new THREE.CircleGeometry(this.options.radius, this.options.extrude_segments)).vertices.slice(1, this.options.extrude_segments + 1)
-				),
-				{extrudePath: new THREE.LineCurve3(lines[index][0].clone(), lines[index][1].clone())}
-			),
+			new THREE.ExtrudeGeometry(this.shapes[index], {extrudePath: this.curves[index]}),
 			new THREE.MeshLambertMaterial({color: this.options.color, wireframe: this.options.wireframe})
 		);
 
 		mesh.isASphere = false;						// Tag tells animate it should do more than change position.
-		mesh.geometry.verticesNeedUpdate = false;	// Saves memory, and the entire geometry will be remade, so no vertices need to change.
+		mesh.geometry.verticesNeedUpdate = true;	// Saves memory, and the entire geometry will be remade, so no vertices need to change.
 		mesh.frustumCulled = false;					// Don't let the camera destroy the whole mesh when it gets too close.
 
+		// console.log(mesh.geometry.verticesNeedUpdate);
 		this.scene.add(mesh);
 		this.meshes.push(mesh);
 	}
@@ -447,18 +484,13 @@ Graph.plot = function(lines, points){
 Create the starting lines and points for the graph from array_lines and perspectify them.
 */
 Graph.initLines = function() {
-	/*
-	Slight problem that must be watched carefully:
-		points and perspective_points must be absolutely parallel.
-		Have to make sure that perspectify is safe, and that it is the only thing that operates
-		on perspective_points.
-	*/
-	// points and perspective_points have to be completely parallel,
+	// points and perspective_points have to be completely parallel, and only perspectify can operate on perspective_points.
 	// Creates the 4cube vector lines and points, aliased together, and centered on the origin.
 	this.lines = this.arrayToVectors(this.array_lines);
 	this.points = this.aliasVectorLinesToPoints(this.lines);
 	this.center(this.points);
 
+	// Adjust the projection to prevent weird projection artifacts.
 	this.plane = this.calculateNewProjection(this.points);
 
 	// Does the same thing as above, but then perspectifies them. These are the points that will actually
@@ -502,4 +534,10 @@ Graph.clearPointsAndLines = function() {
 	this.lines = [];
 	this.perspective_points = [];
 	this.perspective_lines = [];
+}
+
+Graph.resetArray = function(objects) {
+	for (var index in objects){
+		objects[index]
+	}
 }

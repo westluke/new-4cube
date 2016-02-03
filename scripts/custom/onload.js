@@ -67,6 +67,7 @@ $(document).ready(function() {
 		Settings.displayLines(Graph.lines);
 
 		// Start animating the graph, and also start displaying changes to the graph
+		Graph.render();
 		Graph.startRenderAndAnimate();
 
 		// Toggles the display of the settings menu
@@ -111,5 +112,14 @@ $(document).ready(function() {
 	} else {
 		// If the browser has webgl disabled, display the correct message.
 		$("#nowebgl").css("display", "block")
+	}
+
+	window.onunload = function() {
+		// TODO
+ 		//delete all vectors, free all THREE.js objects, delete all main objects
+		Graph.stopRenderAndAnimate();
+		Matrix = null;
+		Graph = null;
+		Settings = null;
 	}
 });
