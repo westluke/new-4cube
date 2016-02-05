@@ -293,24 +293,28 @@ Graph.point_count = 0;
 Graph.requestId = null;
 
 Graph.renderLoop = function() {
+
+	// Settings.updateAllDisplays();
 	// Graph.point_count++;
 
 	// Maybe change instead of deleting and replacing?
-	if (Graph.point_count % 20 == 0){
-		$("#points-edit-containers").empty();
-		Settings.displayLines(Graph.lines);
-		Graph.point_count = 0;
-	}
+	// if (Graph.point_count % 20 == 0){
+	// 	$("#points-edit-containers").empty();
+	// 	Settings.displayLines(Graph.lines);
+	// 	Graph.point_count = 0;
+	// }
 
 	// Only animate if there is something to animate on
 	if (!$.isEmptyObject(Graph.lines)){
 		if (Graph.animating){
-			if (Graph.animate_count % Graph.options.animate_wait == 0){
-
+			// if (Graph.animate_count % Graph.options.animate_wait == 0){
 				Graph.animate();
-				Graph.animate_count = 0;
-			}
-			Graph.animate_count++;
+				// Graph.animate_count = 0;
+			// }
+
+			// else {
+			// 	Graph.animate_count++;
+			// }
 		}
 	}
 
@@ -389,6 +393,16 @@ Graph.updateMeshes = function (points, lines) {
 
 	for (var index in this.meshes){
 		if (this.meshes[index].isASphere){
+			this.meshes[index].geometry.dispose();
+			if (this.meshes[index].geometry.__directGeometry){
+				this.meshes[index].geometry.__directGeometry.dispose();
+			}
+
+			if (this.meshes[index].geometry._bufferGeometry){
+				this.meshes[index].geometry._bufferGeometry.dispose();
+			}
+
+			this.meshes[index].geometry = new THREE.SphereGeometry(this.options.radius, this.options.sphere_segments, this.options.sphere_segments)
 			this.meshes[index].position.copy(points[points_index]);
 			points_index++;
 		}
@@ -409,6 +423,13 @@ Graph.updateMeshes = function (points, lines) {
 			this.curves[index].v2.copy(lines[lines_index][1]);
 
 			this.meshes[index].geometry.dispose();
+			if (this.meshes[index].geometry.__directGeometry){
+				this.meshes[index].geometry.__directGeometry.dispose();
+			}
+
+			if (this.meshes[index].geometry._bufferGeometry){
+				this.meshes[index].geometry._bufferGeometry.dispose();
+			}
 
 			this.meshes[index].geometry = new THREE.ExtrudeGeometry(
 				this.shapes[index],
@@ -455,14 +476,13 @@ Graph.plot = function(lines, points){
 
 		var mesh = new THREE.Mesh(
 			new THREE.ExtrudeGeometry(this.shapes[index], {extrudePath: this.curves[index]}),
-			new THREE.MeshLambertMaterial({color: this.options.color, wireframe: this.options.wireframe})
+			new THREE.MeshLambertMaterial({color: new THREE.Color(this.options.color[0] / 255, this.options.color[1]/255, this.options.color[2]/255), wireframe: this.options.wireframe})
 		);
 
 		mesh.isASphere = false;						// Tag tells animate it should do more than change position.
 		mesh.geometry.verticesNeedUpdate = true;	// Saves memory, and the entire geometry will be remade, so no vertices need to change.
 		mesh.frustumCulled = false;					// Don't let the camera destroy the whole mesh when it gets too close.
 
-		// console.log(mesh.geometry.verticesNeedUpdate);
 		this.scene.add(mesh);
 		this.meshes.push(mesh);
 	}
@@ -470,7 +490,7 @@ Graph.plot = function(lines, points){
 	for (var index in points){
 		var sphere_mesh = new THREE.Mesh(
 			new THREE.SphereGeometry(this.options.radius, this.options.sphere_segments, this.options.sphere_segments),
-			new THREE.MeshLambertMaterial({color: this.options.color, wireframe: this.options.wireframe})		// We need Phong because Lambert won't do flat shading.
+			new THREE.MeshLambertMaterial({color: new THREE.Color(this.options.color[0] / 255, this.options.color[1]/255, this.options.color[2]/255), wireframe: this.options.wireframe})
 		)
 		sphere_mesh.isASphere = true;
 		sphere_mesh.position.set(points[index].x, points[index].y, points[index].z)		// Have to set the actual position with spheres.
@@ -480,6 +500,8 @@ Graph.plot = function(lines, points){
 		this.scene.add(sphere_mesh);
 		this.meshes.push(sphere_mesh);
 	}
+
+	// console.log(this.circles);
 }
 
 /*

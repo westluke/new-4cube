@@ -36,7 +36,7 @@ $(document).ready(function() {
 
 	if (webgl_detect()) {
 		graph_options = {
-			color: 15554377,
+			color: [237, 87, 73],
 			wireframe: false,
 			radius: 0.03,
 			sphere_segments: 8,		// How many segments in the corner spheres

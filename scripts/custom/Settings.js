@@ -1,7 +1,7 @@
 var Settings = new Object();
 
 Settings.init = function() {
-	var Keep = function() {
+	var ManualKeep = function() {
 		this.xy = 0.1;
 		this.yz = 0.1;
 		this.zx = 0.1;
@@ -10,19 +10,19 @@ Settings.init = function() {
 		this.wz = 0.1;
 	}
 
-	this.keep = new Keep();
-	gui = new dat.GUI();
+	this.manual_keep = new ManualKeep();
+	manual_gui = new dat.GUI();
 
-	gui.add(this.keep, "xy", -6.28, 6.28);
-	gui.add(this.keep, "yz", -6.28, 6.28);
-	gui.add(this.keep, "zx", -6.28, 6.28);
-	gui.add(this.keep, "xw", -6.28, 6.28);
-	gui.add(this.keep, "wy", -6.28, 6.28);
-	gui.add(this.keep, "wz", -6.28, 6.28);
+	manual_gui.add(this.manual_keep, "xy", -6.28, 6.28);
+	manual_gui.add(this.manual_keep, "yz", -6.28, 6.28);
+	manual_gui.add(this.manual_keep, "zx", -6.28, 6.28);
+	manual_gui.add(this.manual_keep, "xw", -6.28, 6.28);
+	manual_gui.add(this.manual_keep, "wy", -6.28, 6.28);
+	manual_gui.add(this.manual_keep, "wz", -6.28, 6.28);
 
-	this.keep.xy = this.keep.yz = this.keep.zx = this.keep.xw = this.keep.wy = this.keep.wz = 0.0;
+	this.manual_keep.xy = this.manual_keep.yz = this.manual_keep.zx = this.manual_keep.xw = this.manual_keep.wy = this.manual_keep.wz = 0.0;
 
-	document.getElementById("manual-gui").appendChild(gui.domElement);
+	document.getElementById("manual-gui").appendChild(manual_gui.domElement);
 	$("#manual-control .cr").prepend("<button class='apply-button' onclick='Settings.manualRotate($(this))'>Apply</button> ");
 
 	var AnimateKeep = function() {
@@ -75,26 +75,28 @@ Settings.init = function() {
 	this.geo_keep = new GeometryKeep();
 	var geo_gui = new dat.GUI();
 
-	geo_gui.addColor(this.geo_keep, "color");
+	geo_gui.addColor(this.geo_keep, "color").listen();
 	geo_gui.add(this.geo_keep, "wireframe");
 	geo_gui.add(this.geo_keep, "radius", 0.001, 1);
-	geo_gui.add(this.geo_keep, "sphere segments", 3, 10);
 	geo_gui.add(this.geo_keep, "tube segments", 3, 40);
+	geo_gui.add(this.geo_keep, "sphere segments", 3, 10);
 
-	for (var i in geo_gui.__controllers){
-		geo_gui.__controllers[i].onChange(function() {
-			Graph.clearMeshes();
+	for (var i = 0; i < 5; i++){
+		geo_gui.__controllers[i].onChange(function(){
+			Graph.options.color = Settings.geo_keep.color;
+			Graph.options.wireframe = Settings.geo_keep.wireframe;
+			Graph.options.radius = Settings.geo_keep.radius;
+			Graph.options.extrude_segments = Settings.geo_keep["tube segments"];
+			Graph.options.sphere_segments = Settings.geo_keep["sphere segments"];
 
-			Graph.options = {
-				color: parseInt("0x0" + Settings.rgbToHex(Settings.geo_keep.color).slice(1)),
-				wireframe: Settings.geo_keep.wireframe,
-				radius: Settings.geo_keep.radius,
-				sphere_segments: Settings.geo_keep["sphere segments"],
-				extrude_segments: Settings.geo_keep["tube segments"],
-				animate_wait: Settings.animate_keep["skipped renders"] + 1
+			for (var index in Graph.meshes){
+				Graph.meshes[index].material.dispose();
+				Graph.meshes[index].material = new THREE.MeshLambertMaterial(
+					{color: new THREE.Color(Graph.options.color[0]/255,
+											Graph.options.color[1]/255,
+											Graph.options.color[2]/255),
+											wireframe: Graph.options.wireframe});
 			}
-
-			Graph.plot(Graph.lines, Graph.points);
 		});
 	}
 
@@ -139,8 +141,16 @@ Settings.init = function() {
 		var v2 = new THREE.Vector4(Settings.points_keep.x2, Settings.points_keep.y2, Settings.points_keep.z2, Settings.points_keep.w2);
 
 		Graph.lines.push([v1, v2]);
+		
 		Graph.points = Graph.aliasVectorLinesToPoints(Graph.lines);
 		Graph.clearMeshes();
+
+		for (var index in Graph.circles){
+			Graph.circles[index].dispose();
+			Graph.shapes[index] = null;
+			Graph.curves[index] = null;
+		}
+
 		Graph.plane = Graph.calculateNewProjection(Graph.points);
 		// console.log(Graph.plane);
 		Graph.perspective_lines = Graph.copyVectorLines(Graph.lines);
@@ -153,10 +163,17 @@ Settings.init = function() {
 	$("#clear-button").click(function() {
 		Graph.clearMeshes();
 		Graph.clearPointsAndLines();
+
+		for (var index in Graph.circles){
+			Graph.circles[index].dispose();
+			Graph.shapes[index] = null;
+			Graph.curves[index] = null;
+		}
+
 		$("#points-edit-containers").empty();
 	});
 
-	this.guis = [gui, animate_gui, geo_gui, points_gui1, points_gui2];
+	this.guis = [manual_gui, animate_gui, geo_gui, points_gui1, points_gui2];
 	this.updateAllDisplays();
 
 	var sliders = $("#animation-control .slider");
@@ -191,9 +208,11 @@ Settings.returnToSettings = function() {
 	$("#points-edit").css("display", "none");
 }
 
+// obj is the html element that was clicked.
+// For some reason, this destroys the __directGeometries in the mesh.geometry?
 Settings.manualRotate = function(obj) {
 	var key = obj.parent().find("span.property-name").text();
-	var theta = this.keep[key];
+	var theta = this.manual_keep[key];
 
 	Graph.transformVectors(Graph.points, Matrix.rs[key](theta));
 	Graph.animate();
@@ -211,21 +230,8 @@ Settings.changeAnimateRotationFromKeyValue = function(key, value) {
 	Graph.produceCurrentRotation();
 }
 
-//http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
-Settings.rgbToHex = function(rgb) {
-	var r = rgb[0];
-	var g = rgb[1];
-	var b = rgb[2];
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
-
 Settings.displayLines = function(lines){
 	for (var i in lines){
-		// $("#points-edit-containers").append(
-		// 	"<div class='point-row' onclick='Settings.removeFromList(" + i + ")'> <p class='point-left'>" + this.vectorToString(lines[i][0]) + "</p>" +
-		// 	"<p class='point-right'>" + this.vectorToString(lines[i][1]) + "</p>" +
-		// 	"<button onclick='Settings.removeFromList(" + i + ")'>Remove</button></div>"
-		// );
 		$("#points-edit-containers").append(
 			"<div class='point-row' onclick='Settings.removeFromList(" + i + ")'> <p class='point-left'>" + this.vectorToString(lines[i][0]) + "</p>" +
 			"<p class='point-right'>" + this.vectorToString(lines[i][1]) + "&nbsp;&nbsp;&nbsp;Remove</p>"
@@ -250,8 +256,8 @@ Settings.updateAllDisplays = function() {
 }
 
 Settings.resetGUI = function() {
-	for (var prop in this.keep){
-		this.keep[prop] = 0.0;
+	for (var prop in this.manual_keep){
+		this.manual_keep[prop] = 0.0;
 	}
 
 	for (var prop in this.animate_keep){
@@ -272,14 +278,12 @@ Settings.resetGUI = function() {
 
 	this.updateAllDisplays();
 	this.displayLines(Graph.lines);
-
-	// console.log(Graph.options.animate_wait);
-	// console.log(this.animate_keep["skipped renders"]);
 }
 
 Settings.removeFromList = function(index) {
 	// TODO can this be more efficient? can rebuild from list instead of resetting everything
 	// Just take out the right points (will be null anyways, right?)
+	// Actually I can't really, because ALL of the perspective_point will change, so all meshes must be destroyed, etc.
 
 	var newlines = Graph.copyVectorLines(Graph.lines);
 	Graph.clearMeshes();
@@ -301,6 +305,5 @@ Settings.removeFromList = function(index) {
 		Graph.perspective_points = Graph.aliasVectorLinesToPoints(Graph.perspective_lines);
 		Graph.perspectify(Graph.points, Graph.perspective_points, Graph.plane);
 		Graph.plot(Graph.perspective_lines, Graph.perspective_points);
-
 	}
 }
