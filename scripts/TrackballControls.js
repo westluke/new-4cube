@@ -303,17 +303,20 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
+
 		if ( ! _this.noZoom ) {
 
 			_this.zoomCamera();
 
 		}
 
-		if ( ! _this.noPan ) {
 
+		if ( ! _this.noPan ) {
+			
 			_this.panCamera();
 
 		}
+
 
 		_this.object.position.addVectors( _this.target, _eye );
 

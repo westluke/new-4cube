@@ -2,17 +2,20 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="stylesheets/css/index.css">
-		<link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
+		<!-- <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'> -->
 
 		<script src="scripts/jquery-1.11.3.min.js"></script>
 		<script src="scripts/mrdoob-three.js-1f968fe/build/three.js"></script>
 		<script src="scripts/TrackballControls.js"></script>
 		<script src="scripts/dat-gui/build/dat.gui.js"></script>
 
-		<script src="scripts/custom/Matrix.js"></script>
+		<script src="scripts/custom/Animate.js"></script>
+		<script src="scripts/custom/GL.js"></script>
+		<script src="scripts/custom/GraphObjects.js"></script>
 		<script src="scripts/custom/Graph.js"></script>
+		<script src="scripts/custom/Data.js"></script>
+
 		<script src="scripts/custom/onload.js"></script>
-		<script src="scripts/custom/Settings.js"></script>
 
 		<!-- <script src="scripts/minified2.js"></script> -->
 
@@ -41,7 +44,7 @@
 
 			<!-- This one starts out hidden. -->
 			<div id="points-edit">
-				<button onclick="Settings.returnToSettings()" class="big">< Settings</button>
+				<button class="big">< Settings</button>
 
 				<!-- Contains the list of all the currently plotted points, with buttons to remove them. -->
 				<div id = "points-edit-containers"></div>
@@ -98,7 +101,7 @@
 					<div id="points-button-container">
 						<button id="plot-button">Plot</button>
 						<button id="clear-button">Clear all</button>
-						<button onclick="Settings.displayPoints()">Edit current points</button>
+						<button >Edit current points</button>
 					</div>
 
 					<div style="clear: both"></div>
