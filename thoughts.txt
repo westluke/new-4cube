@@ -199,9 +199,87 @@ Well how should the points be transformed exactly?
 
 Old system was to have the points in the array be aliased to the points in the lines. That was quite efficient.
 And it is the most efficient way to update continuously. it's also really fucking confusing.
-that kind of system might require a rework of the GraphObjects
+that kind of system might require a rework of the GraphObjects.
+Well I'm DEFINITELY going to use this system because it is so much more efficient.
+What should the systems around it look like?
+
+OPtions:
+array of vectors aliased to array of Line objects. Both passed to graph, cloned to enter the Tube and Sphere objects.
+array of Sphere objects whose vectors are aliased to the vectors in the Line objects in the Tube objects?
+	this one requires temporary inconsistent states, as the geometries would have to be rebuilt AFTER the aliasing changes.
+	would have to remember to do that, and to do it correctly.
+	If we did this, we would have to rebuild some classes to make them safe for aliasing, and I don't want to do that right now.
+
+INSTEAD: we keep the aliasing separate from the THREE.js objects, and make Data handle that.
+will have to alias the vectors into the vector components of each line. Because the lines are really just containers for those vectors,
+won't break validity, only breaks encapsulation a little.
+
+this doesn't significantly impact the animation performance because the real cost of the updating of GraphObjects
+is the reconstruction of the geometries, which would have to happen even if we weren't aliasing.
+
+The real cost of the building of the data is the continuous projection, which IS significantly helped by aliasing.
 
 Graph objects shouldn't have conditional assignment to property, should have both conditional assignment and conditional updating, when possible
 Actually, the updatePath methods can't really change, and the material changing is fast enough.
 
 I DO NOT NEED TO ASSIGN TO NULL BEFORE A SECOND ASSIGNMENT. WILL LOSE REFERENCE ANYWAYS
+
+When do I really need to know the length of a line? never, I think. So we can keep that as a method, but not a property.
+
+// Stores FOUR-dimensional coordinates, never THREE-dimensional.
+// How do we want checking for containing of points to work? We would want to know WHICH vector matched,
+// probably all in one step. We could also just pass a single vector to alias, which would figure out which one to replace.
+// Doesnt need to find MaxDistance, that would be done through points.
+
+// How would Data really use these? It goes through the list of points, and for each point,
+// checks whether it is contained in any line in lines. That would only happen during the initialization of the data.
+// That's not as important. What would we want to happen when another line is added? we check whether either point
+// is the same as any other point in the list. If not, we add the new points.
+// If both are unique, totally new line created and added.
+// if only one unique, we make a new line, but alias the non-unique one. Neither requires the containsPoint methods.
+
+// What if we want to remove a line? we need to check whether either point overlaps with any others.
+// After that, if neither overlaps, we destroy everything.
+// If both overlap, we destroy the line, but DON'T call destroy() on it.
+// If only one overlaps, we have to specify its destruction, then nullify the line.
+
+// On ANY identity change to points or lines, ppoints and plines must be updated.
+// Quick clarification: NO VECTORS ARE ALIASED between the normal and p versions.
+// vectores ARE ALIASED between ppoints and plines
+
+// How is that done?
+// MOST EFFICIENT WAY: assuming that the arrays of lines and plines, points and ppoints are absolutely parallel,
+// down to the v1 and v2 of each line, we can just call exactly the same methods whenever points or lines are changed.
+// That's what would be done anyways.
+// This means that the starting arrays must be completely parallel, and then everything else should follow cleanly
+// from there. ACTUALLY YOU KNOW WHAT: THE REALLY SAFE WAY TO DO THIS WOULD BE TO BUILD AN ENCAPSULATING PARALLEL
+// ARRAYS OBJECT. but that would be difficult. Which operations would be parallel, and which wouldn't?
+
+// Yeah that would be hard. Imagine trying to place an aliased pair in the normal list. The parallel array would have to
+// clone both parts, but keep the aliased connection between them, which would be impossible. It would have to know that they
+// were aliased together, which seems like a break of specialization.
+
+// identity tested with ==, congruency with .equals
+
+/*
+I do need the ppoint and pline system right? What would my alternatives be?
+Well what do I really need to pass in to Graph? I could perspectify every point individually, but that would require
+either mutation or the creation of a new variable every time.
+
+OR What if I kept just one vector variable and one line variable that mutated to match the perspective versions
+of each vector and line?
+I could send that one over to mutate the corresponding Tubes and Spheres based on index.
+BIG QUESTION: Is there a higher cost? YES. Each line would have to be perspectified individually, so that's out.
+
+I HAVE TO UPDATE PPOINTS, AND LET THOSE CHANGES ALIAS SOOOMEEHOOOW
+Yeeaahh, ppoints and plines seem like hte best option, unfortunately.
+so yeaah, I'll just construct them properly on initialization and have to remember to update them in parallel all the time.
+
+I would always prefer to mutate other variables, which means keeping a
+
+Should I integrate the Lines with the Tubes? that would mean making them store a curve instead of two vectors.
+That would have the benefit of not having to pass a new array to Graph every time, and instead having the changes alias into the GraphObjects.
+Then, Graph could just recreate the geometry for every object, without also copying each new vector
+into the curves of the GraphObjects. That's actually kinda like Mesh.assignGeometry(), which I was comfortable and even happy with.
+Yeah. The ACCEPTED usage of meshes is to pull
+Wait no that's different. That maybe have been a mixture of scopes, but it wasn't aliasing.

@@ -1,7 +1,7 @@
 // Calls mutative methods on data, graph, ui
 
-var Animation = function(	animate_wait,
-							point_wait,
+var Animation = function(	animateWait,
+							pointWait,
 							gl,
 							data,
 							graph,
@@ -19,17 +19,17 @@ var Animation = function(	animate_wait,
 
 	// Determines how long to wait between animations of the graph. Can be used to
 	// lighten gpu and memory load.
-	this.animate_wait = animate_wait;
-	this.animate_count = 0;
+	this.animateWait = animateWait;
+	this.animateCount = 0;
 
 	// The ID of the animation request
 	this.requestID = null;
 
 	// Similar variables for the constant updating of the points display while it is active.
-	this.updating_points = false;
-	this.point_wait = point_wait;
-	this.point_count = 0;
-	this.points_requestID = null;
+	this.updatingPoints = false;
+	this.pointWait = pointWait;
+	this.pointCount = 0;
+	this.pointsRequestID = null;
 }
 
 // This function generates an anonymous function that already knows about the variable ani.
@@ -39,10 +39,10 @@ Animation.prototype.loop = function (ani) {
 	return function() {
 		if (ani.rendering){
 			if (ani.animating){
-				if (ani.animate_count % ani.animate_wait == 0){
+				if (ani.animateCount % ani.animateWait == 0){
 					ani.animate();
 				}
-				ani.animate_count ++;
+				ani.animateCount ++;
 			}
 
 			ani.gl.updateControls();
@@ -56,9 +56,9 @@ Animation.prototype.loop = function (ani) {
 
 Animation.prototype.pointsUpdateLoop = function (ani) {
 	return function() {
-		if (ani.updating_points){
+		if (ani.updatingPoints){
 			ani.ui.updatePoints();
-			ani.points_requestID = window.requestAnimationFrame(ani.pointsUpdateLoop(ani));
+			ani.pointsRequestID = window.requestAnimationFrame(ani.pointsUpdateLoop(ani));
 		}
 	}
 }
@@ -95,7 +95,7 @@ Animation.prototype.stopAnimate = function() {
 }
 
 Animation.prototype.setAnimateWait = function(wait){
-	this.animate_wait = wait;
+	this.animateWait = wait;
 }
 
 Animation.prototype.animate = function() {
@@ -103,17 +103,17 @@ Animation.prototype.animate = function() {
 }
 
 Animation.prototype.startPointsUpdate = function() {
-	if (!this.updating_points){
-		this.updating_points = true;
-		this.points_requestID = window.requestAnimationFrame(this.pointsUpdateLoop(this));
+	if (!this.updatingPoints){
+		this.updatingPoints = true;
+		this.pointsRequestID = window.requestAnimationFrame(this.pointsUpdateLoop(this));
 	}
 }
 
 Animation.prototype.stopPointsUpdate = function() {
-	this.updating_points = false;
+	this.updatingPoints = false;
 
-	if (this.points_requestID){
-		window.cancelAnimationFrame(this.points_requestID);
-		this.points_requestID = null;
+	if (this.pointsRequestID){
+		window.cancelAnimationFrame(this.pointsRequestID);
+		this.pointsRequestID = null;
 	}
 }
