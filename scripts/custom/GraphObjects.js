@@ -1,93 +1,49 @@
 // These represent the actual objects being displayed through webgl.
+// For tubes, their shape and material are constant for all, so they can be aliased.
+// The line is aliased so that it updates immediately when Data perspectifies.
+// The shapes are wrapped in a shapeWrapper for ease of aliasing.
 
-var Tube = function (	color,
-						wireframe,
-						radius,
-						segments,
+var Tube = function (	shapeWrap,
+						material,
 						line	// a Line object containing the curve
 						) {
 
-	this.color = color;
-	this.wireframe = wireframe;
-	this.radius = radius;
-	this.segments = segments;
-	this.line = line;
-
-	// Creates a circle shape, which I can pull vertices out of to build the tube.
-	this.circle = new THREE.CircleGeometry(radius, segments);
-
-	// Pulls the necessary vertices from the circle.
-	this.shape = new THREE.Shape(this.circle.vertices.slice(1, segments + 1));
+	this.shapeWrap, this.line;
+	this.aliasLine(line);
+	this.aliasShape(shapeWrap);
 
 	// Creates a cylinder geometry from the circle, along the curve
-	this.geo = new THREE.ExtrudeGeometry(this.shape, {extrudePath: this.line.curve});
-
-	// Lambert materials permit shading
-	this.material = new THREE.MeshLambertMaterial({
-		color: new THREE.Color(	color[0],
-								color[1],
-								color[2]	),
-		wireframe: wireframe
-	});
+	this.geo = new THREE.ExtrudeGeometry(this.shapeWrap.shape, {extrudePath: line.curve});
 
 	// Create the mesh from all the pieces
-	this.mesh = new THREE.Mesh(this.geo, this.material);
+	this.mesh = new THREE.Mesh(this.geo, material);
 }
 
 // For when the aliased line is changed from outside and the graph needs to respond.
+// Also should be called when the shape is changed.
 Tube.prototype.remakeGeo = function() {
 	this.geo.dispose();
-	this.geo = new THREE.ExtrudeGeometry(this.shape, {extrudePath: this.line.curve});
+	this.geo = new THREE.ExtrudeGeometry(this.shapeWrap.shape, {extrudePath: this.line.curve});
 
 	this.mesh.geometry = this.geo;
 }
 
-// args is {radius, segments}
-Tube.prototype.updateShape = function(args) {
-	this.radius = args.radius || this.radius;
-	this.segments = args.segments || this.segments;
-
-	this.circle.dispose();
-
-	this.circle = new THREE.CircleGeometry(
-		this.radius,
-		this.segments
-	)
-
-	this.shape = new THREE.Shape(this.circle.vertices.slice(1, this.segments + 1));
-
-	this.remakeGeo();
+Tube.prototype.aliasMaterial = function(material) {
+	this.mesh.material.dispose();
+	this.mesh.material = material;
 }
 
-// mat_args is {color, wireframe}
-Tube.prototype.updateMaterial = function(mat_args) {
-	this.color = mat_args.color || this.color;
-	this.wireframe = mat_args.wireframe || this.wireframe;
-
-	this.material.color = new THREE.Color(	this.color[0],
-											this.color[1],
-											this.color[2]	);
-
-	this.material.wireframe = this.wireframe;
+Tube.prototype.aliasShape = function(shapeWrap) {
+	this.shapeWrap = shapeWrap;
 }
 
-Tube.prototype.destroy = function(remover) {
-	this.color = null;
-	this.wireframe = null;
-	this.radius = null;
-	this.segments = null;
+Tube.prototype.aliasLine = function(line){
+	this.line = line;
+}
 
-	this.line.destroy();
-
-	this.circle.dispose();
-	this.shape = null;
+Tube.prototype.destroy = function() {
 	this.geo.dispose();
-	this.material.dispose();
 
-	return this.getMesh();
-}
-
-Tube.prototype.getMesh = function() {
 	return this.mesh;
 }
 
@@ -95,68 +51,64 @@ Tube.prototype.getMesh = function() {
 
 
 
-
-var Sphere = function (	color,
-						wireframe,
-						radius,
-						segments,
-						position
+// The situation is different for spheres. Their geometries and materials are constant for all,
+// but we can't alias geometries if we want to change their position. Cloning them is quite efficient though,
+// so we do that instead of remaking the geometries.
+var Sphere = function (	geo,
+						position,
+						material
 						) {
 
-	this.color = color;
-	this.wireframe = wireframe;
-	this.radius = radius;
-	this.segments = segments;
+	this.geo = geo.clone();
+	this.aliasPosition(position);
 
-	this.position = position;
-
-	this.geo = new THREE.SphereGeometry(this.radius,
-										this.segments,
-										this.segments);
-
-	this.material = new THREE.MeshLambertMaterial({
-		color: new THREE.Color(this.color),
-		wireframe: this.wireframe
-	});
-
-	this.mesh = new THREE.Mesh(this.geo, this.material)
-	this.mesh.position = this.position;
+	this.mesh = new THREE.Mesh(this.geo, material)
+	this.updatePosition();
 }
 
-Sphere.prototype.updateShape = function(args) {
-	this.radius = args.radius || this.radius;
-	this.segments = args.segments || this.segments;
-
+Sphere.prototype.remakeGeo = function(geo) {
 	this.geo.dispose();
-	this.geo = new THREE.SphereGeometry(this.radius,
-										this.segments,
-										this.segments);
+	this.geo = geo.clone();
+
 	this.mesh.geometry = this.geo;
 }
 
-Sphere.prototype.updateMaterial = function(mat_args) {
-	this.color = mat_args.color || this.color;
-	this.wireframe = mat_args.wireframe || this.wireframe;
+Sphere.prototype.updatePosition = function() {
+	this.mesh.position.copy(this.position);
+}
 
-	this.material.color = new THREE.Color(	this.color[0],
-											this.color[1],
-											this.color[2]	);
+Sphere.prototype.aliasMaterial = function(material) {
+	this.mesh.material.dispose();
+	this.mesh.material = material;
+}
 
-	this.material.wireframe = this.wireframe;
+Sphere.prototype.aliasPosition = function(v) {
+	this.position = v;
 }
 
 Sphere.prototype.destroy = function() {
-	this.color = null;
-	this.wireframe = null;
-	this.radius = null;
-	this.segments = null;
-
 	this.geo.dispose();
-	this.material.dispose();
 
-	return this.getMesh();
+	return this.mesh;
 }
 
-Sphere.prototype.getMesh = function() {
-	return this.mesh;
+
+
+
+
+
+var ShapeWrapper = function (radius, segments) {
+	this.circle = new THREE.CircleGeometry(radius, segments);
+	this.shape = new THREE.Shape(this.circle.vertices.slice(1, segments + 1));
+}
+
+ShapeWrapper.prototype.updateShape = function(radius, segments) {
+	this.circle.dispose();
+	this.circle = new THREE.CircleGeometry(radius, segments);
+	this.shape = new THREE.Shape(this.circle.vertices.slice(1, segments + 1));
+}
+
+ShapeWrapper.prototype.destroy = function() {
+	this.circle.dispose();
+	this.shape = null;
 }

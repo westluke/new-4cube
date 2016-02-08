@@ -4,12 +4,10 @@ var Animation = function(	animateWait,
 							pointWait,
 							gl,
 							data,
-							graph,
 							ui) {
 
 	this.gl = gl;
 	this.data = data;
-	this.graph = graph;
 	this.ui = ui;
 
 	// Flags that inform the object of whether or not the render loop is running,
@@ -99,7 +97,7 @@ Animation.prototype.setAnimateWait = function(wait){
 }
 
 Animation.prototype.animate = function() {
-	this.gl.mesh.rotation.x += 0.01;
+	// this.gl.mesh.rotation.x += 0.01;
 }
 
 Animation.prototype.startPointsUpdate = function() {

@@ -18,31 +18,12 @@ $(document).ready(function() {
 		z: 3
 	}
 
-	var data = new Data();
-	
-	// console.log("Length" + l.getLength());
-	// console.log(l.containsPoint(new THREE.Vector4(0, 0, 1, 0)));
-
-	// l.getV1() = new THREE.Vector4(0, 1, 1, 1);
-	// l.setV1(new THREE.Vector4(1, 1, 1, 1));
-	// console.log(l.curve.v1);
-	// console.log(l.equals(l2));
+	var gl = new GL("graph-container", [1, 1, 1], 0.1, 3, cam_args);
 
 
-
-
-	// data.initializeCube(init_lines, init_points);
-
-	// var gl = new GL("graph-container", [1, 1, 1], 0.1, 3, cam_args);
-	// var graph
-	// var animation = new Animation(1, 1, gl);
-	// animation.startRender();
-	//
-	// var l = new Line(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1))
-
-	// window.onresize = function() {
-	// 	gl.fitNewSize();
-	// }
+	window.onresize = function() {
+		gl.fitNewSize();
+	}
 });
 
 // http://stackoverflow.com/questions/11871077/proper-way-to-detect-webgl-support
@@ -85,7 +66,7 @@ function webgl_detect(return_context) {
 // OH OKAY so first we create vectors and alias them (doing the same thing to lines and ppoints, only with cloning)
 // THEN we subtract the vector from all points.
 
-var init_lines = [
+var initLines = [
 [ [0,0,0,0], [0,0,0,1] ],
 [ [0,0,0,0], [0,0,1,0] ],
 [ [0,0,0,0], [0,1,0,0] ],
@@ -118,22 +99,3 @@ var init_lines = [
 [ [1,0,1,0], [1,1,1,0] ],
 [ [1,1,1,0], [1,1,0,0] ],
 [ [1,1,0,0], [1,1,0,1] ] ];
-
-var init_points = [
-new THREE.Vector4(0, 0, 0, 0),
-new THREE.Vector4(0, 0, 0, 1),
-new THREE.Vector4(0, 0, 1, 0),
-new THREE.Vector4(0, 1, 0, 0),
-new THREE.Vector4(1, 0, 0, 0),
-new THREE.Vector4(0, 0, 1, 1),
-new THREE.Vector4(0, 1, 0, 1),
-new THREE.Vector4(1, 0, 0, 1),
-new THREE.Vector4(0, 1, 1, 0),
-new THREE.Vector4(1, 0, 1, 0),
-new THREE.Vector4(1, 1, 0, 0),
-new THREE.Vector4(0, 1, 1, 1),
-new THREE.Vector4(1, 0, 1, 1),
-new THREE.Vector4(1, 1, 0, 1),
-new THREE.Vector4(1, 1, 1, 0),
-new THREE.Vector4(1, 1, 1, 1)
-];
