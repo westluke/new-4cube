@@ -32,7 +32,7 @@ Graph.prototype.plotSphere = function(v) {
 Graph.prototype.plotTube = function(line) {
 	var t = new Tube(this.shapeWrap, this.material, line)
 	this.tubes.push(t);
-	this.gl.addToScene(t);
+	this.gl.addToScene(t.mesh);
 }
 
 Graph.prototype.removeSphere = function(index) {
@@ -57,17 +57,30 @@ Graph.prototype.updateMaterials = function(color, wireframe) {
 
 Graph.prototype.updateTubeShape = function(radius, segments) {
 	this.shapeWrap.updateShape(radius, segments);
+	this.remakeTubeGeos();
 }
 
 Graph.prototype.changeSphereGeo = function(radius, segments) {
 	this.sphere_geo.dispose();
 	this.sphere_geo = new THREE.SphereGeometry(radius, segments, segments);
-	this.remakeSphereGeos();
+	this._remakeSphereGeos();
 }
 
-Graph.prototype.remakeSphereGeos = function() {
+Graph.prototype._remakeSphereGeos = function() {
 	for (var i = 0; i < this.spheres.length; i++) {
 		this.spheres[i].remakeGeo(this.sphere_geo);
+	}
+}
+
+Graph.prototype.remakeTubeGeos = function() {
+	for (var i = 0; i < this.tubes.length; i++) {
+		this.tubes[i].remakeGeo();
+	}
+}
+
+Graph.prototype.updateSpherePositions = function() {
+	for (var i = 0; i < this.spheres.length; i++) {
+		this.spheres[i].updatePosition();
 	}
 }
 

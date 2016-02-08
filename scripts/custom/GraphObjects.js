@@ -22,10 +22,17 @@ var Tube = function (	shapeWrap,
 // For when the aliased line is changed from outside and the graph needs to respond.
 // Also should be called when the shape is changed.
 Tube.prototype.remakeGeo = function() {
+	if (this.line.curve.getLength() == 0){
+		this.line.curve.updateArcLengths();
+	}
+
 	this.geo.dispose();
+	this.mesh.geometry.dispose();
+	this.mesh.geometry = null;
 	this.geo = new THREE.ExtrudeGeometry(this.shapeWrap.shape, {extrudePath: this.line.curve});
 
 	this.mesh.geometry = this.geo;
+	// console.log(this.geo);
 }
 
 Tube.prototype.aliasMaterial = function(material) {

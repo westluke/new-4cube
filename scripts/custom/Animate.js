@@ -3,12 +3,13 @@
 var Animation = function(	animateWait,
 							pointWait,
 							gl,
-							data,
-							ui) {
+							data ){//,
+							// data,
+							// ui) {
 
 	this.gl = gl;
 	this.data = data;
-	this.ui = ui;
+	// this.ui = ui;
 
 	// Flags that inform the object of whether or not the render loop is running,
 	// and whether or not the graph is being animated in the loop.
@@ -28,6 +29,8 @@ var Animation = function(	animateWait,
 	this.pointWait = pointWait;
 	this.pointCount = 0;
 	this.pointsRequestID = null;
+
+	this.rot = Matrix.xy(0.01);
 }
 
 // This function generates an anonymous function that already knows about the variable ani.
@@ -96,7 +99,10 @@ Animation.prototype.setAnimateWait = function(wait){
 	this.animateWait = wait;
 }
 
+
 Animation.prototype.animate = function() {
+	this.data.transform(this.rot);
+	// this.data.transformWithCurrentMatrix();
 	// this.gl.mesh.rotation.x += 0.01;
 }
 

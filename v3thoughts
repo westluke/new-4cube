@@ -207,4 +207,55 @@ to assignment. The = operator does nothing to them. Do not understand how that i
 AH okay. Object.defineProperty allows you to customize how properties work, including making them immutable.
 You can also kinda make them private!
 
-I MADE A CHANGE TO THREE.JS FOR CONVENIENCE! REMEMBER THAT THAT IS VERY DANGEROUS!
+I DIDN'T FUCKING TEST THE GRAPH PROPERLY
+
+OKAY Here's the problem: If I plot a tube that wouldn't display (both points the same)
+THEN try to set one point to something different, THEN try to update, the tube becomes 2-dimensional.
+
+As a result, the lines in initLines that differ only in their w-coordinate become 2-dimensional.
+because the geometry is completely remade every time, I suspect the problem lies in the mesh.
+
+ACTUALLY, I think the problem is with the curve. It can update; but if it updates after being a point,
+it stays 2-dimensional.
+
+FOUND THE SOLUTION! Have to call updateArcLengths on the curve.
+
+or try needsUpdate?
+
+okay I HAVE to improve the addLine, removeLine, and initializeCube functions, because they are impossible to debug.
+
+should I make data accept lines? cost isn't huge, easier to work with.
+but then I would have to make the plines from those lines, which is annoying.
+maybe Data would be easier to use if I wrapped more objects.
+like what? Maybe the arrays of points and lines, but that wouldn't shorten anything.
+
+How to fix Data?
+I know vectors should be passed in, not lines, because there isn't a significant ease difference but there is a cost
+difference.
+I know that initializeCube should make repeated calls to addLine.
+The question is, how should addLine work?
+
+what if I created a class that kept track of which points and lines were aliased together?
+and maybe the points could be wrapped.
+How would that help add a line, for instance?
+
+but that would make aliasing even more confusing.
+no, let's not do that.
+In this case, the brute force methods are kinda the only way to do things.
+
+maybe they could use ID's to speed things up
+each Point could store the points it was connected to, and the lines it was a part of
+each Line could
+
+add each point and alias
+
+how will Data do transformations?
+use old system.
+It keeps an object of all transformations, based on the current slider setting.
+That gets updated in settings.
+every time it does, we compute a new currentTransform.
+
+don't recreate the matrix every time. May have taken a lot of memory last time.
+
+Are you kidding me? The issue was the library all along.
+Fuck me.
