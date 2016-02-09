@@ -1,17 +1,19 @@
-// These represent the actual objects being displayed through webgl.
-
 var Tube = function (	color,
 						wireframe,
 						radius,
 						segments,
-						line	// a Line object containing the curve
-						) {
+						start,
+						end) {
 
 	this.color = color;
 	this.wireframe = wireframe;
 	this.radius = radius;
 	this.segments = segments;
-	this.line = line;
+
+	this.curve = new THREE.LineCurve3(
+		start.clone(),
+		end.clone()
+	);
 
 	// Creates a circle shape, which I can pull vertices out of to build the tube.
 	this.circle = new THREE.CircleGeometry(radius, segments);
@@ -20,7 +22,7 @@ var Tube = function (	color,
 	this.shape = new THREE.Shape(this.circle.vertices.slice(1, segments + 1));
 
 	// Creates a cylinder geometry from the circle, along the curve
-	this.geo = new THREE.ExtrudeGeometry(this.shape, {extrudePath: this.line.curve});
+	this.geo = new THREE.ExtrudeGeometry(this.shape, {extrudePath: this.curve});
 
 	// Lambert materials permit shading
 	this.material = new THREE.MeshLambertMaterial({
@@ -32,14 +34,6 @@ var Tube = function (	color,
 
 	// Create the mesh from all the pieces
 	this.mesh = new THREE.Mesh(this.geo, this.material);
-}
-
-// For when the aliased line is changed from outside and the graph needs to respond.
-Tube.prototype.remakeGeo = function() {
-	this.geo.dispose();
-	this.geo = new THREE.ExtrudeGeometry(this.shape, {extrudePath: this.line.curve});
-
-	this.mesh.geometry = this.geo;
 }
 
 // args is {radius, segments}
@@ -56,7 +50,10 @@ Tube.prototype.updateShape = function(args) {
 
 	this.shape = new THREE.Shape(this.circle.vertices.slice(1, this.segments + 1));
 
-	this.remakeGeo();
+	this.geo.dispose();
+	this.geo = new THREE.ExtrudeGeometry(this.shape, {extrudePath: this.curve});
+
+	this.mesh.geometry = this.geo;
 }
 
 // mat_args is {color, wireframe}
@@ -71,13 +68,22 @@ Tube.prototype.updateMaterial = function(mat_args) {
 	this.material.wireframe = this.wireframe;
 }
 
+// Change the position of the tube
+Tube.prototype.updatePath = function(v1, v2) {
+	this.curve.v1.copy(v1);
+	this.curve.v2.copy(v2);
+	this.updateShape({});
+}
+
 Tube.prototype.destroy = function(remover) {
 	this.color = null;
 	this.wireframe = null;
 	this.radius = null;
 	this.segments = null;
 
-	this.line.destroy();
+	this.curve.v1 = null;
+	this.curve.v2 = null;
+	this.curve = null;
 
 	this.circle.dispose();
 	this.shape = null;
@@ -91,6 +97,11 @@ Tube.prototype.getMesh = function() {
 	return this.mesh;
 }
 
+Tube.prototype.equals = function(tube) {
+	TODO
+}
+
+
 
 
 
@@ -99,16 +110,12 @@ Tube.prototype.getMesh = function() {
 var Sphere = function (	color,
 						wireframe,
 						radius,
-						segments,
-						position
-						) {
+						segments) {
 
 	this.color = color;
 	this.wireframe = wireframe;
 	this.radius = radius;
 	this.segments = segments;
-
-	this.position = position;
 
 	this.geo = new THREE.SphereGeometry(this.radius,
 										this.segments,
@@ -120,7 +127,10 @@ var Sphere = function (	color,
 	});
 
 	this.mesh = new THREE.Mesh(this.geo, this.material)
-	this.mesh.position = this.position;
+}
+
+Sphere.prototype.move = function(v) {
+	this.mesh.position.copy(v);
 }
 
 Sphere.prototype.updateShape = function(args) {

@@ -21,79 +21,47 @@ Data.prototype.perspective = function() {
 
 }
 
-// Precondition: the data object's arrays are empty
-Data.prototype.initializeCube = function(initLines) {
-	var v1Index;
-	var v2Index;
 
-	for (var lineIndex = 0; lineIndex < initLines.length; lineIndex ++){
-		v1Index = -1;
-		v2Index = -1;
 
-		this.lines[lineIndex] = new Line(null, null);
-		this.plines[lineIndex] = new Line(null, null);
 
-		for (var pointIndex = 0; pointIndex < this.points.length; pointIndex ++){
-			if (Data.compareArrayToVector(initLines[lineIndex][0], this.points[pointIndex])){
-				v1Index = pointIndex;
-			}
 
-			if (Data.compareArrayToVector(initLines[lineIndex][1], this.points[pointIndex])){
-				v2Index = pointIndex;
-			}
-		}
 
-		if (v1Index >= 0){
-			this.lines[lineIndex].v1 = this.points[v1Index];
-			this.plines[lineIndex].v1 = this.ppoints[v1Index];
-
-		} else {
-			var newPoint = new THREE.Vector4(0, 0, 0, 0);
-			newPoint.fromArray(this.lines[lineIndex]);
-			var newPPoint = newPoint.clone();
-
-			this.points.push(newPoint);
-			this.ppoints.push(newPPoint;
-
-			this.lines[lineIndex].v1 = newPoint;
-			this.plines[lineIndex].v1 = newPPoint;
-		}
-
-		if (v2Index >= 0){
-			this.lines[lineIndex].v2 = this.points[v1Index];
-			this.plines[lineIndex].v2 = this.ppoints[v1Index];
-
-		} else {
-			var newPoint = new THREE.Vector4(0, 0, 0, 0);
-			newPoint.fromArray(this.lines[lineIndex]);
-			var newPPoint = newPoint.clone();
-
-			this.points.push(newPoint);
-			this.ppoints.push(newPPoint;
-
-			this.lines[lineIndex].v2 = newPoint;
-			this.plines[lineIndex].v2 = newPPoint;
-		}
-	}
+var Line = function(v1, v2) {
+	this.v1 = v1;
+	this.v2 = v2;
+	this.length = Math.sqrt(this.v1 * this.v1 + this.v2 * this.v2);
 }
 
-// Should this call Graph's reset function?
-// I don't think so, not its business.
-Data.prototype.reset = function() {
-	for (var i = 0; i < this.points.length; i++) {
-		this.points[i] = null;
-	}
-	this.points = [];
-
-	for (var i = 0; i < this.lines.length; i++) {
-		this.lines[i].destroy();
-	}
-	this.lines = [];
+Line.prototype.equals = function(line) {
+	return (	(this.v1.equals(line.v1) && this.v2.equals(line.v2)) ||
+				(this.v2.equals(line.v1) && this.v1.equals(line.v2))	);
 }
 
-Data.compareArrayToVector = function(arr, v) {
-	return (arr[0] == v.x &&
-			arr[1] == v.y &&
-			arr[2] == v.z &&
-			arr[3] == v.w	);
+Line.prototype.containsPoint = function(v) {
+	return (this.v1.equals(v) || this.v2.equals(v));
+}
+
+Line.prototype.transform = function(transform){
+	this.v1.applyMatrix4(transform);
+	this.v2.applyMatrix4(transform);
+}
+
+Line.prototype.set = function(vs){
+	if (vs.v1){
+		v1.copy(vs.v1);
+	}
+
+	if (vs.v2){
+		v2.copy(vs.v2);
+	}
+
+	this.length = Math.sqrt(this.v1 * this.v1 + this.v2 * this.v2);
+}
+
+Line.prototype.getLength = function() {
+	return this.length;
+}
+
+Line.prototype.maxDistanceToOrigin = function() {
+	return Math.max(this.v1.length, this.v2.length)
 }
