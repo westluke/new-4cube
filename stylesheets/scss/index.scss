@@ -76,6 +76,7 @@ h1, h2 {
 	width: 300px;
 	overflow-y: scroll;
 	overflow-x: hidden;
+	// overflow: visible;
 	z-index: 3;
 }
 
@@ -202,6 +203,7 @@ h1, h2 {
 		}
 
 		input {
+			// display: none;
 			width: 62% !important;
 			margin-right: 60px;
 			position: relative;
@@ -299,6 +301,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 
 .apply-button:hover {
 	background-color: $focus;
+	// text-decoration: none;
 }
 
 #points-gui1 {
@@ -328,10 +331,12 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 	font-family: 'Inconsolata', monospace;
 	font-weight: bold;
 	padding: 2px;
+	// border: 1px solid $light-blue-grey;
 	background-color: $dark-grey;
 	z-index: 100;
 	cursor: pointer;
 	border-radius: 1px;
+	// text-decoration: underline;
 }
 
 #points-customizer button:hover {
@@ -357,6 +362,10 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 	font-size: 13px;
 	overflow-y: scroll;
 
+	// p {
+	// 	margin-top: 5px;
+	// }
+
 	#points-edit-containers {
 		margin-top: 60px;
 
@@ -379,15 +388,24 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 			}
 			button {
 				float: right;
+				// margin-right: 10px;
 				font-size: 13px;
 				position: absolute;
 				right: 10px;
 				padding-bottom: 4px;
+				// top: 1px;
+				// bottom: -2px;
+				// margin-top: -1px;
 				background-color: inherit;
 				color: $burnt-orange;
 				font-family: 'Inconsolata', monospace;
+				// cursor: pointer;
+				// padding: 2px;
 				box-shadow: none;
 			}
+				// button:hover {
+				// 	background-color: $light-blue-grey;
+				// }
 		}
 		div:hover {
 			background-color: $focus;
@@ -396,6 +414,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 
 	.big {
 		color: $burnt-orange;
+		// text-decoration: underline;
 		font-family: 'Inconsolata', monospace;
 		font-weight: bold;
 		font-size: 18px;
