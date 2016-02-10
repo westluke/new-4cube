@@ -30,7 +30,7 @@ var Animation = function(	animateWait,
 	this.pointCount = 0;
 	this.pointsRequestID = null;
 
-	this.rot = Matrix.xy(0.01);
+	this.rot = Matrix.xw(0.01);
 }
 
 // This function generates an anonymous function that already knows about the variable ani.
@@ -101,8 +101,16 @@ Animation.prototype.setAnimateWait = function(wait){
 
 
 Animation.prototype.animate = function() {
-	this.data.transform(this.rot);
-	// this.data.transformWithCurrentMatrix();
+
+	// this.data.transform(Matrix.xw(0.01));
+	// this.data.graph.upda
+	// ((this.data.graph.material.color[2]) += 1);
+
+	// this.data.currentTransform = this.rot;
+		// this.data.transform(this.rot);
+	this.data.setTransform("xw", 0.01);
+	this.data.produceCurrentTransform();
+	this.data.transformWithCurrentMatrix();
 	// this.gl.mesh.rotation.x += 0.01;
 }
 

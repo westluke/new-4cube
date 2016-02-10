@@ -30,58 +30,67 @@ var Data = function(graph) {
 // FUCKING BROKEN
 // lineExists is shit
 Data.prototype.addLine = function(v1, v2) {
-	if (this.lineExists(v1, v2)){
+	if (this._lineExists(v1, v2)){
 		return;
 	}
 
 	var line = new Line();
 	var pline = new Line();
 
-	indices = this.findPointIndices(v1, v2)
+	var v1s = this._addPoint(v1);
 
-	if (indices[0] >= 0){
-		line.aliasV1(this.points[indices[0]]);
-		pline.aliasV1(this.ppoints[indices[0]]);
-	} else {
-		var point = v1.clone();
-		var ppoint = v1.clone();
-		this.points.push(point);
-		this.ppoints.push(ppoint);
+	line.aliasV1(v1s[0]);
+	pline.aliasV1(v1s[1]);
 
-		line.aliasV1(point);
-		pline.aliasV1(ppoint);
+	var v2s = this._addPoint(v2);
 
-		this.graph.plotSphere(ppoint);
-	}
-
-	if (indices[1] >= 0){
-		line.aliasV2(this.points[indices[1]]);
-		pline.aliasV2(this.ppoints[indices[1]]);
-	} else {
-		var point = v2.clone();
-		var ppoint = v2.clone();
-		this.points.push(point);
-		this.ppoints.push(ppoint);
-
-		line.aliasV2(point);
-		pline.aliasV2(ppoint);
-
-		this.graph.plotSphere(ppoint);
-	}
+	line.aliasV2(v2s[0]);
+	pline.aliasV2(v2s[1]);
 
 	v1 = null;
 	v2 = null;
 
-	// this.lines.push(line);
-	// this.plines.push(pline);
-
-	// this.calculateNewPlane();
-	// this.perspective();
-	// console.log(pline);
 	this.graph.plotTube(pline);
 }
 
-Data.prototype.lineExists = function(v1, v2) {
+// If v is already in points, returns the matched point and its corresponding ppoint.
+// If v is not already in points, inserts it in both and returns two clones.
+// Return type: [point, ppoint];
+Data.prototype._addPoint(v) {
+	for (int i = 0; i < this.points.length; i++){
+		if (this.points[i].equals(v)){
+			return [this.points[i], this.ppoints[i]];
+		}
+	}
+	var point = v.clone();
+	var ppoint = v.clone();
+	this.points.push(point);
+	this.ppoints.push(ppoint);
+
+	return [point, ppoint];
+}
+
+// If any line contains the vector, nothing is done.
+// If no line contains the vector, the vector is spliced out,
+//the passed vector is freed, and the sphere at the index is destroyed.
+Data.prototype._removePoint(v, index) {
+	for (int i = 0; i < this.lines.length) {
+		if (this.lines[i].containsPoint){
+			return;
+		}
+	}
+
+	for (int i = 0; i < this.points.length) {
+		if (this.points[i].equals(v)){
+			this.points.splice(i, 1);
+			this.ppoints.splice(i, 1);
+			this.graph.removeSphere(i);
+		}
+	}
+	v = null;
+}
+
+Data.prototype._lineExists = function(v1, v2) {
 	for (var i = 0; i < this.lines.length; i++){
 		if (this.lines[i].containsPoint(v1) && this.lines[i].containsPoint(v2)){
 			return true;
@@ -92,34 +101,16 @@ Data.prototype.lineExists = function(v1, v2) {
 
 // NO. What we need to do is check all the other lines to see if they also
 // contain the matched points.
+// Also need to remove spheres if necessary
+// Make removePoint function?
 Data.prototype.removeLine = function(index) {
 	var v1Found = false;
 	var v2Found = false;
 	var line = this.lines.splice(index, 1)[0];
-	var indices = this.findPointIndices(line.curve.v1, line.curve.v2);
-
-	for (var i = 0; i < this.lines.length; i++){
-		if (this.lines[i].contains(line.curve.v1)){
-			v1Found = true;
-		}
-		if (this.lines[i].contains(line.curve.v2)){
-			v2Found = true;
-		}
-	}
-
-	if (!v1Found){
-		line.curve.v1 = null;
-		this.points.splice(indices[0], 1);
-	}
-
-	if (!v2Found){
-		line.curve.v2 = null;
-		this.points.splice(indices[1], 1);
-	}
+	this._removePoint(line.curve.v1);
+	this._removePoint(line.curve.v2);
 
 	this.graph.removeTube(index);
-	// this.calculateNewPlane();
-	// this.perspective();
 }
 
 // use to replace pieces in line adding methods.
@@ -129,15 +120,20 @@ Data.prototype.findPointIndices = function(v1, v2) {
 
 	for (var i = 0; i < this.points.length; i++) {
 		if (v1.equals(this.points[i])){
+			console.log("V1 " + i);
 			ret[0] = i;
 		}
 		if (v2.equals(this.points[i])){
+			console.log("V2 ");
+			console.log(this.points);
 			ret[1] = i;
 		}
 		if (ret[0] >= 0 && ret[1] >= 0){
 			break;
 		}
 	}
+
+	// console.log("indices " + ret);
 
 	return ret;
 }
@@ -201,6 +197,8 @@ Data.prototype.initializeCube = function(initLines) {
 
 	this.graph.remakeTubeGeos();
 	this.graph.updateSpherePositions();
+
+	// console.log(this.lines);
 }
 
 Data.prototype.reset = function() {
@@ -244,10 +242,12 @@ Data.prototype.transformWithCurrentMatrix = function() {
 
 Data.prototype.produceCurrentTransform = function() {
 	this.currentTransform.identity();
+	var test = this;
 
 	Object.keys(this.allSubTransforms).forEach(function(key) {
-		if (this.allSubTransforms[key] != null){
-			this.currentTransform.multiply(this.allSubTransforms[key]);
+		// console.log(this.allSubTransforms);
+		if (test.allSubTransforms[key] != null){
+			test.currentTransform.multiply(test.allSubTransforms[key]);
 		}
 	})
 }

@@ -259,3 +259,17 @@ don't recreate the matrix every time. May have taken a lot of memory last time.
 
 Are you kidding me? The issue was the library all along.
 Fuck me.
+
+Maybe there should be an option for getting a list of all the lines from the Data object.
+
+But the lists will stay in the same ORDER! as long as I manage the objects through Data correctly, everything will be fine.
+
+Is there any better way to manage the array?
+could sort it, then grab by ID? could have another class that correlates indices to id's somehow?
+want to remove based on WHAT THE OBJECTS are, not by their position in the array.
+That's the important bit.
+could remove based on the vector information? I don't see how that would work.
+Actually, we could always have the index increase, kind of like id, never splice directly.
+
+It would still be splicing with a list, wouldn't it. Maybe best option in Data is to do things one at a time,
+not grabbing multiple indices at a time.

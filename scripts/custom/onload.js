@@ -19,14 +19,50 @@ $(document).ready(function() {
 	}
 
 	var gl = new GL("graph-container", [1, 1, 1], 0.1, 3, cam_args);
-	var graph = new Graph(gl, [0.5, 0.5, 1], false, 0.05, 10, 10);
+	var graph = new Graph(gl, [0.5, 0.5, 1], false, 0.05, 10, 20);
 	var data = new Data(graph);
-	data.setTransform("xy", 0.01);
+	// data.setTransform("xy", 0.01);
 
 	data.initializeCube(initLines);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+
+	data.removeLine(0);
+	data.removeLine(0);
+	data.removeLine(0);
+
+	data.removeLine(0);
+	// data.removeLine(0);
 	// console.log(initLines);
 	var animation = new Animation(1, 1, gl, data);
-	animation.startRenderAndAnimate();
+	animation.startRender();
 
 	window.onresize = function() {
 		gl.fitNewSize();

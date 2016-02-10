@@ -36,13 +36,15 @@ Graph.prototype.plotTube = function(line) {
 }
 
 Graph.prototype.removeSphere = function(index) {
-	this.gl.removeFromScene(this.spheres[index].destroy);
+	console.log(index);
+	console.log(this.spheres);
+	this.gl.removeFromScene(this.spheres[index].destroy());
 	this.spheres[index] = null;
 	this.spheres.splice(index, 1);
 }
 
 Graph.prototype.removeTube = function(index) {
-	this.tubes.removeFromScene(this.tubes[index].destroy);
+	this.gl.removeFromScene(this.tubes[index].destroy());
 	this.tubes[index] = null;
 	this.tubes.splice(index, 1);
 }
