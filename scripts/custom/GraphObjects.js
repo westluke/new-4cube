@@ -66,18 +66,15 @@ var Sphere = function (	geo,
 						material
 						) {
 
-	this.geo = geo.clone();
 	this.aliasPosition(position);
 
-	this.mesh = new THREE.Mesh(this.geo, material)
+	this.mesh = new THREE.Mesh(geo, material)
 	this.updatePosition();
 }
 
 Sphere.prototype.remakeGeo = function(geo) {
-	this.geo.dispose();
-	this.geo = geo.clone();
-
-	this.mesh.geometry = this.geo;
+	this.mesh.geometry.dispose();
+	this.mesh.geometry = geo;
 }
 
 Sphere.prototype.updatePosition = function() {
@@ -94,8 +91,6 @@ Sphere.prototype.aliasPosition = function(v) {
 }
 
 Sphere.prototype.destroy = function() {
-	this.geo.dispose();
-
 	return this.mesh;
 }
 

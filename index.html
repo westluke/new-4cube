@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="stylesheets/css/index.css">
-		<!-- <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'> -->
+		<link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
 		<script src="scripts/jquery-1.11.3.min.js"></script>
 		<script src="scripts/mrdoob-three.js-1f968fe/build/three.js"></script>
@@ -16,6 +16,7 @@
 		<script src="scripts/custom/Data.js"></script>
 		<script src="scripts/custom/Line.js"></script>
 		<script src="scripts/custom/Matrix.js"></script>
+		<script src="scripts/custom/UI.js"></script>
 
 		<script src="scripts/custom/onload.js"></script>
 
@@ -92,7 +93,7 @@
 				<!-- The editing button hides the main settings container and reveals the points-edit-container -->
 				<div id="points-customizer" class="gui-container">
 					<h2>
-						Points customizer
+						Lines customizer
 					</h2>
 
 					<div id="points-gui1" class="pgui">
@@ -102,8 +103,8 @@
 
 					<div id="points-button-container">
 						<button id="plot-button">Plot</button>
-						<button id="clear-button">Clear all</button>
-						<button >Edit current points</button>
+						<!-- <button id="clear-button">Clear all</button> -->
+						<button id="edit-points-button">Edit current lines</button>
 					</div>
 
 					<div style="clear: both"></div>
@@ -113,7 +114,7 @@
 
 		<!-- The title that displays at the top right. -->
 		<h1 id = "title">
-			4Shadow.io
+			4Shadow.io V3
 		</h1>
 
 		<!-- The icon for the settings bar -->

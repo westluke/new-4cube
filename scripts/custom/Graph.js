@@ -19,26 +19,24 @@ var Graph = function(	gl,
 
 	this.material = new THREE.MeshLambertMaterial({
 		wireframe: wireframe,
-		color: new THREE.Color(color[0], color[1], color[2])
+		color: new THREE.Color(color[0] / 255, color[1] / 255, color[2] / 255)
 	});
 }
 
 Graph.prototype.plotSphere = function(v) {
-	var s = new Sphere(this.sphere_geo, v, this.material)
+	var s = new Sphere(this.sphere_geo, v, this.material);
 	this.spheres.push(s);
 	this.gl.addToScene(s.mesh);
 }
 
 Graph.prototype.plotTube = function(line) {
-	var t = new Tube(this.shapeWrap, this.material, line)
+	var t = new Tube(this.shapeWrap, this.material, line);
 	this.tubes.push(t);
 	this.gl.addToScene(t.mesh);
 }
 
 Graph.prototype.removeSphere = function(index) {
-	console.log(index);
-	console.log(this.spheres);
-	this.gl.removeFromScene(this.spheres[index].destroy());
+	this.gl.removeFromScene(this.spheres[index].mesh);
 	this.spheres[index] = null;
 	this.spheres.splice(index, 1);
 }
@@ -51,9 +49,9 @@ Graph.prototype.removeTube = function(index) {
 
 // Will also update all the GraphObjects.
 Graph.prototype.updateMaterials = function(color, wireframe) {
-	this.material.color.r = color[0];
-	this.material.color.g = color[1];
-	this.material.color.b = color[2];
+	this.material.color.r = color[0] / 255;
+	this.material.color.g = color[1] / 255;
+	this.material.color.b = color[2] / 255;
 	this.material.wireframe = wireframe;
 }
 
@@ -86,22 +84,24 @@ Graph.prototype.updateSpherePositions = function() {
 	}
 }
 
-Graph.prototype.resetPointsAndTubes = function() {
+Graph.prototype.reset = function() {
 	for (var i = 0; i < this.spheres.length; i++){
-		this.gl.remove(this.spheres[i].destroy());
+		this.gl.removeFromScene(this.spheres[i].mesh);
+		this.spheres[i].mesh = null;
 		this.spheres[i] = null;
 	}
 	this.spheres = [];
 
 	for (var i = 0; i < this.tubes.length; i++){
-		this.gl.remove(this.tubes[i].destroy());
+		this.gl.removeFromScene(this.tubes[i].destroy());
+		this.tubes[i].mesh = null;
 		this.tubes[i] = null;
 	}
 	this.tubes = [];
 }
 
 Graph.prototype.destroy = function() {
-	this.resetPointsAndTubes();
+	this.reset();
 	this.spheres = null;
 	this.tubes = null;
 

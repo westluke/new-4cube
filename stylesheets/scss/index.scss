@@ -4,9 +4,10 @@ $burnt-orange: #ED5749;
 $dark-burnt-orange: #BE463A;
 $focused-grey: #75797A;
 $focus: #5c5e66;
+$font: "Inconsolata", monospace, sans-serif;
 
 noscript, #nowebgl {
-	font-family: 'Inconsolata', monospace;
+	font-family: $font;
 	color: $burnt-orange;
 	font-size: 20px;
 	font-weight: bold;
@@ -34,11 +35,15 @@ noscript, #nowebgl {
 	}
 }
 
+button {
+	font-family: $font;
+}
+
 html, body {
 	height: 100%;
 	width: 100%;
 	background-color: $light-blue-grey;
-	font-family: 'Inconsolata', monospace;
+	font-family: $font;
 	color: $burnt-orange;
 }
 
@@ -58,7 +63,8 @@ canvas {
 }
 
 h1, h2 {
-	font-family: 'Inconsolata', monospace, bold;
+	font-family: $font;
+	// font-family: 'Inconsolata', monospace, bold;
 	color: $burnt-orange;
 }
 
@@ -168,7 +174,7 @@ h1, h2 {
 	min-width: 300px;
 
 	h2 {
-		font-family: 'Inconsolata', monospace;
+		font-family: $font;
 		font-size: 16px;
 		color: $burnt-orange;
 		margin-left: 15px;
@@ -180,7 +186,8 @@ h1, h2 {
 	width: calc(100% - 10px) !important;
 	min-width: calc(100% - 10px) !important;
 	color: $burnt-orange !important;
-	font-family: 'Inconsolata', monospace !important;
+	// font-family: 'Inconsolata', monospace !important;
+	font-family: $font;
 	font-size: 14px !important;
 
 	.close-button {
@@ -246,7 +253,8 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 		float: right !important;
 
 		input {
-			font-family: 'Inconsolata', monospace !important;
+			// font-family: 'Inconsolata', monospace !important;
+			font-family: $font;
 			position: relative;
 			bottom: 3px;
 			font-size: 14px !important;
@@ -275,7 +283,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 }
 
 #animation-gui .dg.main.a {
-	min-height: 140px !important;
+	min-height: 120px !important;
 }
 
 #manual-gui .dg.main.a {
@@ -286,7 +294,7 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 	position: absolute;
 	left: 60px;
 	margin-top: 3px;
-	font-family: 'Inconsolata', monospace;
+	// font-family: 'Inconsolata', monospace;
 	font-size: 13px;
 	color: $burnt-orange;
 	background-color: $dark-grey;
@@ -311,21 +319,20 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 
 .pgui {
 	width: calc(50% - 30px);
-	height: 5px;
+	// height: 5px;
 	margin-right: 15px;
 }
 
 #points-button-container {
 	position: absolute;
-	bottom: 18px;
-	left: 15px;
+	bottom: 23px;
+	left: 13px;
 }
 
 #points-customizer button{
 	margin-right: 10px;
 	color: $burnt-orange;
 	font-size: 13px;
-	font-family: 'Inconsolata', monospace;
 	font-weight: bold;
 	padding: 2px;
 	background-color: $dark-grey;
@@ -385,7 +392,8 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 				padding-bottom: 4px;
 				background-color: inherit;
 				color: $burnt-orange;
-				font-family: 'Inconsolata', monospace;
+				// font-family: 'Inconsolata', monospace;
+				font-family: $font;
 				box-shadow: none;
 			}
 		}
@@ -396,7 +404,8 @@ html body #settings .gui-container .dg.main.a .cr input:focus {
 
 	.big {
 		color: $burnt-orange;
-		font-family: 'Inconsolata', monospace;
+		// font-family: 'Inconsolata', monospace;
+		font-family: $font;
 		font-weight: bold;
 		font-size: 18px;
 		background-color: $dark-grey;

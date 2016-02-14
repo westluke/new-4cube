@@ -273,3 +273,6 @@ Actually, we could always have the index increase, kind of like id, never splice
 
 It would still be splicing with a list, wouldn't it. Maybe best option in Data is to do things one at a time,
 not grabbing multiple indices at a time.
+
+What am I afraid of? fucking up one index puts all the parallel arrays out of sync, that's the issue.
+ID's would fix that.
