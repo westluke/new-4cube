@@ -84,8 +84,6 @@ UI.prototype.initAnimation = function() {
 	this.animationGUI.add(this.animationKeep, "wy", -6.28, 6.28).listen();
 	this.animationGUI.add(this.animationKeep, "wz", -6.28, 6.28).listen();
 
-	// this.animationGUI.add(this.animationKeep, "skipped renders", 0, 10);
-
 	Object.keys(this.animationKeep).forEach(function(key){
 		this.animationKeep[key] = 0.0;
 	}, this);
@@ -94,7 +92,6 @@ UI.prototype.initAnimation = function() {
 
 	for (var i = 0; i < 6; i++) {
 		this.animationGUI.__controllers[i].onChange(function (value) {
-			console.log("hi");
 			context.data.setTransform(this.property, value/60);
 			context.data.produceCurrentTransform();
 		})

@@ -14,18 +14,23 @@ Matrix.rotationMatrix4d = function (axes, theta){
 Matrix.xy = function (theta){
     return Matrix.rotationMatrix4d([0, 1], theta);
 }
+
 Matrix.yz = function (theta){
     return Matrix.rotationMatrix4d([1, 2], theta);
 }
+
 Matrix.zx = function (theta){
     return Matrix.rotationMatrix4d([2, 0], theta);
 }
+
 Matrix.xw = function (theta){
     return Matrix.rotationMatrix4d([0, 3], theta);
 }
+
 Matrix.wy = function (theta){
     return Matrix.rotationMatrix4d([3, 1], theta);
 }
+
 Matrix.wz = function (theta){
     return Matrix.rotationMatrix4d([3, 2], theta);
 }

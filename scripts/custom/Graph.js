@@ -99,18 +99,3 @@ Graph.prototype.reset = function() {
 	}
 	this.tubes = [];
 }
-
-Graph.prototype.destroy = function() {
-	this.reset();
-	this.spheres = null;
-	this.tubes = null;
-
-	this.sphere_geo.dispose();
-	this.sphere_geo = null;
-
-	this.shapeWrap.destroy();
-	this.shapeWrap = null;
-
-	this.material.dispose();
-	this.material = null;
-}

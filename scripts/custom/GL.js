@@ -40,19 +40,7 @@ var GL = function(	graph_container,
 						light_color[2]
 	));
 
-	// console.log(this.light);
 	this.addToScene(this.light);
-
-	// this.mesh = new THREE.Mesh(
-	// 	new THREE.BoxGeometry(1, 1, 1),
-	// 	new THREE.MeshLambertMaterial({color: 0xffffff})
-	// );
-	//
-	// this.mesh.material.wireframe = true;
-	//
-	// this.mesh.position.copy(new THREE.Vector3(0, 0, 0));
-	//
-	// this.addToScene(this.mesh);
 }
 
 GL.prototype.fitNewSize = function() {

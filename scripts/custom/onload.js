@@ -18,8 +18,18 @@ $(document).ready(function() {
 		z: 3
 	}
 
-	var gl = new GL("graph-container", [1, 1, 1], 0.1, 3, cam_args);
-	var graph = new Graph(gl, [237, 87, 73], false, 0.04, 8, 20);
+	var gl = new GL(	"graph-container",
+						[1, 1, 1],
+						0.1,
+						3,
+						cam_args	);
+
+	var graph = new Graph(	gl,
+							[237, 87, 73],
+							false,
+							0.04,
+							8,
+							20	);
 
 	var data = new Data(graph);
 	var ui = new UI(data, graph);
@@ -27,49 +37,32 @@ $(document).ready(function() {
 	data.initializeCube(initLines);
 	ui.initializePointDisplay(initLines);
 
-	var animation = new Animation(1, 1, gl, data);
-	animation.startRenderAndAnimate();
+	var animation = new Repeat(1, function() {
+		data.transformWithCurrentMatrix();
+	});
 
+	animation.start();
 
-	// var v = new THREE.Vector4(0.5, 0.5, 0.5, 0.5);
-	// var v1;
-	// var v2;
-	// var temp;
-	// var ret = "";
-	//
-	// for (var i = 0; i < initLines.length; i++) {
-	// 	v1 = initLines[i][0];
-	// 	v2 = initLines[i][1]
-	// 	v1.sub(v);
-	// 	v2.sub(v);
-	// 	ret += "[ ";
-	//
-	// 	for (var j = 0; j < 2; j++){
-	// 		temp = [v1, v2][j];
-	// 		if (j == 1){
-	// 			ret += ", "
-	// 		}
-	// 		temp = [v1, v2][j];
-	// 		ret += ("new THREE.Vector4(" + temp.x + ", " + temp.y + ", " + temp.z + ", " + temp.w + ")");
-	// 	}
-	//
-	// 	ret += " ],\n";
-	// }
+	var renderCycle = new Repeat(1, function() {
+		gl.render();
+		gl.updateControls();
+		gl.moveLightToCamera();
+	});
 
-	// console.log(ret);
+	renderCycle.start();
 
 	window.onresize = function() {
 		gl.fitNewSize();
 	}
 
 	$("#animate-button").click(function() {
-		if (!animation.animating){
-			animation.startRenderAndAnimate();
+		if (!animation.running){
+			animation.start();
 			$("#animate-button h1").text("Stop animation");
 		}
 
 		else {
-			animation.stopAnimate();
+			animation.stop();
 			$("#animate-button h1").text("Animate");
 		}
 	});
@@ -122,40 +115,6 @@ function webgl_detect(return_context) {
     // WebGL not supported
     return false;
 }
-
-// var initLines = [
-// [ new THREE.Vector4(0,0,0,0), new THREE.Vector4(0,0,0,1) ],
-// [ new THREE.Vector4(0,0,0,0), new THREE.Vector4(0,0,1,0) ],
-// [ new THREE.Vector4(0,0,0,0), new THREE.Vector4(0,1,0,0) ],
-// [ new THREE.Vector4(0,0,0,0), new THREE.Vector4(1,0,0,0) ],
-// [ new THREE.Vector4(0,0,0,1), new THREE.Vector4(0,0,1,1) ],
-// [ new THREE.Vector4(0,0,0,1), new THREE.Vector4(0,1,0,1) ],
-// [ new THREE.Vector4(0,0,0,1), new THREE.Vector4(1,0,0,1) ],
-// [ new THREE.Vector4(0,0,1,1), new THREE.Vector4(0,0,1,0) ],
-// [ new THREE.Vector4(0,0,1,1), new THREE.Vector4(0,1,1,1) ],
-// [ new THREE.Vector4(0,0,1,1), new THREE.Vector4(1,0,1,1) ],
-// [ new THREE.Vector4(0,0,1,0), new THREE.Vector4(0,1,1,0) ],
-// [ new THREE.Vector4(0,0,1,0), new THREE.Vector4(1,0,1,0) ],
-// [ new THREE.Vector4(0,1,1,0), new THREE.Vector4(0,1,0,0) ],
-// [ new THREE.Vector4(0,1,1,0), new THREE.Vector4(0,1,1,1) ],
-// [ new THREE.Vector4(0,1,1,0), new THREE.Vector4(1,1,1,0) ],
-// [ new THREE.Vector4(0,1,0,0), new THREE.Vector4(0,1,0,1) ],
-// [ new THREE.Vector4(0,1,0,0), new THREE.Vector4(1,1,0,0) ],
-// [ new THREE.Vector4(0,1,0,1), new THREE.Vector4(0,1,1,1) ],
-// [ new THREE.Vector4(0,1,0,1), new THREE.Vector4(1,1,0,1) ],
-// [ new THREE.Vector4(0,1,1,1), new THREE.Vector4(1,1,1,1) ],
-// [ new THREE.Vector4(1,1,1,1), new THREE.Vector4(1,0,1,1) ],
-// [ new THREE.Vector4(1,1,1,1), new THREE.Vector4(1,1,1,0) ],
-// [ new THREE.Vector4(1,1,1,1), new THREE.Vector4(1,1,0,1) ],
-// [ new THREE.Vector4(1,0,1,1), new THREE.Vector4(1,0,0,1) ],
-// [ new THREE.Vector4(1,0,1,1), new THREE.Vector4(1,0,1,0) ],
-// [ new THREE.Vector4(1,0,0,1), new THREE.Vector4(1,0,0,0) ],
-// [ new THREE.Vector4(1,0,0,1), new THREE.Vector4(1,1,0,1) ],
-// [ new THREE.Vector4(1,0,0,0), new THREE.Vector4(1,0,1,0) ],
-// [ new THREE.Vector4(1,0,0,0), new THREE.Vector4(1,1,0,0) ],
-// [ new THREE.Vector4(1,0,1,0), new THREE.Vector4(1,1,1,0) ],
-// [ new THREE.Vector4(1,1,1,0), new THREE.Vector4(1,1,0,0) ],
-// [ new THREE.Vector4(1,1,0,0), new THREE.Vector4(1,1,0,1) ] ];
 
 var initLines = [
 [ new THREE.Vector4(-0.5, -0.5, -0.5, -0.5), new THREE.Vector4(-0.5, -0.5, -0.5, 0.5) ],

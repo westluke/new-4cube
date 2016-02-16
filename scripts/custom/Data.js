@@ -1,6 +1,3 @@
-// The functions here that interact with points don't call perspective() or calculateNewPlane() again,
-// so we just have to remember to do that before rendering ? Is that a good plan?
-
 var Data = function(graph) {
 	this.graph = graph;
 	this.points = [];
@@ -25,7 +22,6 @@ var Data = function(graph) {
 Data.prototype.addLine = function(v1, v2, destroy) {
 
 	if (this._lineExists(v1, v2)){
-		// console.log("line exists");
 		return -1;
 	}
 
@@ -54,8 +50,6 @@ Data.prototype.addLine = function(v1, v2, destroy) {
 		v1 = null;
 		v2 = null;
 	}
-
-	console.log(pline);
 
 	// returns the index of the new line
 	return this.lines.length - 1;
@@ -149,16 +143,17 @@ Data.prototype.calculateNewPlane = function(){
 		}
 	}
 
+	if (maxLength == 0) {
+		this.plane = 0.1;
+		return;
+	}
+
 	this.plane = maxLength;
 }
 
 // Calculates the projection of every 4d vector from this.lines,
 // and copies the projected vectors into this.plines, allowing the graph to update.
 Data.prototype.perspective = function() {
-	// if (this.plane == undefined){
-	// 	throw "ERROR: Plane undefined in Data.prototype.perspective";
-	// }
-
 	var divisor;
 
 	// The projection is very simple: it scales down distance of each vector from the origin in 3d space
@@ -182,13 +177,6 @@ Data.prototype.initializeCube = function(initLines) {
 	for (var i = 0; i < initLines.length; i ++){
 		this.addLine(initLines[i][0], initLines[i][1], false);
 	}
-
-	// // Centers the 4cube around the origin
-	// var subtractor = new THREE.Vector4(0.5, 0.5, 0.5, 0.5);
-	//
-	// for (var i = 0; i < this.points.length; i++){
-	// 	this.points[i].sub(subtractor);
-	// }
 
 	this.calculateNewPlane();
 	this.perspective();
@@ -219,7 +207,7 @@ Data.prototype.reset = function() {
 	this.lines = [];
 	this.plines = [];
 
-	this.graph.resetPointsAndTubes();
+	this.graph.reset();
 }
 
 Data.prototype.transform = function(matrix){

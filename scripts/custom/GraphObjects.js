@@ -8,49 +8,33 @@ var Tube = function (	shapeWrap,
 						line	// a Line object containing the curve
 						) {
 
-	this.shapeWrap, this.line;
-	this.aliasLine(line);
-	this.aliasShape(shapeWrap);
-
-	// Creates a cylinder geometry from the circle, along the curve
-	this.geo = new THREE.ExtrudeGeometry(this.shapeWrap.shape, {extrudePath: line.curve});
+	this.shapeWrap = shapeWrap;
+	this.line = line;
 
 	// Create the mesh from all the pieces
-	this.mesh = new THREE.Mesh(this.geo, material);
+	// Geometry is a cylinder stretched along the curve.
+	this.mesh = new THREE.Mesh(
+		new THREE.ExtrudeGeometry(
+			this.shapeWrap.shape,
+			{extrudePath: this.line.curve}
+		), material);
 }
 
 // For when the aliased line is changed from outside and the graph needs to respond.
 // Also should be called when the shape is changed.
 Tube.prototype.remakeGeo = function() {
+
+	// If the curve had length 0 before, it keeps length 0 until the arcLengths are updated.
 	if (this.line.curve.getLength() == 0){
 		this.line.curve.updateArcLengths();
 	}
 
-	this.geo.dispose();
 	this.mesh.geometry.dispose();
-	this.mesh.geometry = null;
-	this.geo = new THREE.ExtrudeGeometry(this.shapeWrap.shape, {extrudePath: this.line.curve});
-
-	this.mesh.geometry = this.geo;
-	// console.log(this.geo);
-}
-
-Tube.prototype.aliasMaterial = function(material) {
-	this.mesh.material.dispose();
-	this.mesh.material = material;
-}
-
-Tube.prototype.aliasShape = function(shapeWrap) {
-	this.shapeWrap = shapeWrap;
-}
-
-Tube.prototype.aliasLine = function(line){
-	this.line = line;
+	this.mesh.geometry = new THREE.ExtrudeGeometry(this.shapeWrap.shape, {extrudePath: this.line.curve});
 }
 
 Tube.prototype.destroy = function() {
-	this.geo.dispose();
-
+	this.mesh.geometry.dispose();
 	return this.mesh;
 }
 
@@ -66,7 +50,7 @@ var Sphere = function (	geo,
 						material
 						) {
 
-	this.aliasPosition(position);
+	this.position = position;
 
 	this.mesh = new THREE.Mesh(geo, material)
 	this.updatePosition();
@@ -81,20 +65,6 @@ Sphere.prototype.updatePosition = function() {
 	this.mesh.position.copy(this.position);
 }
 
-Sphere.prototype.aliasMaterial = function(material) {
-	this.mesh.material.dispose();
-	this.mesh.material = material;
-}
-
-Sphere.prototype.aliasPosition = function(v) {
-	this.position = v;
-}
-
-Sphere.prototype.destroy = function() {
-	return this.mesh;
-}
-
-
 
 
 
@@ -108,9 +78,4 @@ ShapeWrapper.prototype.updateShape = function(radius, segments) {
 	this.circle.dispose();
 	this.circle = new THREE.CircleGeometry(radius, segments);
 	this.shape = new THREE.Shape(this.circle.vertices.slice(1, segments + 1));
-}
-
-ShapeWrapper.prototype.destroy = function() {
-	this.circle.dispose();
-	this.shape = null;
 }
