@@ -1,13 +1,11 @@
-function print(obj){
-	var x = obj;
-	console.log(x);
-}
-
 $(document).ready(function() {
+
+	// If they don't have webgl enabled there's nothing I can do.
 	if (!webgl_detect()){
 		return;
 	}
 
+	// Set up parameters for the camera that views the figure
 	var cam_args = {
 		fov: 60,
 		aspect_ratio: 1,
@@ -18,12 +16,14 @@ $(document).ready(function() {
 		z: 3
 	}
 
+	// Set up the webgl instance
 	var gl = new GL(	"graph-container",
 						[1, 1, 1],
 						0.1,
 						3,
 						cam_args	);
 
+	// Set up the graph of the figure using the webgl instance
 	var graph = new Graph(	gl,
 							[237, 87, 73],
 							false,
@@ -31,18 +31,24 @@ $(document).ready(function() {
 							8,
 							20	);
 
+	// Set up the data that will be used to build the graph
 	var data = new Data(graph);
+
+	// Set up the user interface from the data
 	var ui = new UI(data, graph);
 
+	// Initialize the data using the set of lines (all the lines of a hypercube) that is recorded below.
 	data.initializeCube(initLines);
 	ui.initializePointDisplay(initLines);
 
+	// Start an animation of the hypercube
 	var animation = new Repeat(1, function() {
 		data.transformWithCurrentMatrix();
 	});
 
 	animation.start();
 
+	// Start a cycle of rendering the hypercube
 	var renderCycle = new Repeat(1, function() {
 		gl.render();
 		gl.updateControls();
@@ -55,6 +61,7 @@ $(document).ready(function() {
 		gl.fitNewSize();
 	}
 
+	// Toggle animation
 	$("#animate-button").click(function() {
 		if (!animation.running){
 			animation.start();
@@ -67,6 +74,7 @@ $(document).ready(function() {
 		}
 	});
 
+	// Toggle settings appearance
 	$("#menu-icon").click(function() {
 		if ($("#settings-wrapper").css("display") == "none") {
 			$("#settings-wrapper").css("display", "block");
@@ -76,6 +84,7 @@ $(document).ready(function() {
 		}
 	});
 
+	// Reset the cube to hypercube lines, stop the animations, reset the appearance.
 	$("#reset-button").click(function() {
 		data.initializeCube(initLines);
 		data.clearTransforms();
@@ -86,7 +95,7 @@ $(document).ready(function() {
 	});
 });
 
-// http://stackoverflow.com/questions/11871077/proper-way-to-detect-webgl-support
+// CODE USED FROM iglooJuan's RESPONSE ON http://stackoverflow.com/questions/11871077/proper-way-to-detect-webgl-support
 function webgl_detect(return_context) {
     if (!!window.WebGLRenderingContext) {
         var canvas = document.createElement("canvas"),

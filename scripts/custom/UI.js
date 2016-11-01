@@ -23,12 +23,14 @@ var UI = function (	data,
 	this.nextPointIndex = 0;
 }
 
+// An object to store settings of any kind
 UI.prototype.Keep = function(props) {
 	Object.keys(props).forEach(function(key) {
 		this[key] = props[key];
 	}, this);
 }
 
+// Initalize the manual section of the settings page
 UI.prototype.initManual = function() {
 	this.manualKeep = new this.Keep({
 		xy: 0.1,
@@ -64,6 +66,7 @@ UI.prototype.initManual = function() {
 	});
 }
 
+// Initialize the animation section of the settings div
 UI.prototype.initAnimation = function() {
 	this.animationKeep = new this.Keep({
 		xy: 0.1,
@@ -90,6 +93,8 @@ UI.prototype.initAnimation = function() {
 
 	var context = this;
 
+
+	// The cube animation needs to update every time one of these values is changed.
 	for (var i = 0; i < 6; i++) {
 		this.animationGUI.__controllers[i].onChange(function (value) {
 			context.data.setTransform(this.property, value/60);
@@ -98,13 +103,10 @@ UI.prototype.initAnimation = function() {
 	}
 
 	this.animationKeep.xw = 0.5;
+
+	// initial settings to produce a nice rotation
 	this.data.setTransform("xw", 0.5 / 60);
 	this.data.produceCurrentTransform();
-	// this.animationGUI.__controllers[3].onChange(0.5);
-
-	// this.animationGUI.__controllers[6].onChange(function() {
-	// 	this.updateDisplay();
-	// });
 
 	document.getElementById("animation-gui").appendChild(this.animationGUI.domElement);
 }
@@ -136,15 +138,18 @@ UI.prototype.initGeo = function() {
 		});
 	}
 
+	// Both functions need to be called when the radius changes
 	this.geoGUI.__controllers[2].onChange(function() {
 		context.graph.changeSphereGeo(context.geoKeep.radius, context.geoKeep["sphere segments"]);
 		context.graph.updateTubeShape(context.geoKeep.radius, context.geoKeep["tube segments"]);
 	});
 
+	// Individual calls for the sphere segments
 	this.geoGUI.__controllers[3].onChange(function() {
 		context.graph.changeSphereGeo(context.geoKeep.radius, context.geoKeep["sphere segments"]);
 	});
 
+	// And another individual call for the tube segments.
 	this.geoGUI.__controllers[4].onChange(function() {
 		context.graph.updateTubeShape(context.geoKeep.radius, context.geoKeep["tube segments"]);
 	});
@@ -190,6 +195,7 @@ UI.prototype.initPoints = function() {
 		}
 	}
 
+	// A little weird. Just need to access the "this" of the current containing object inside these functions.
 	var context = this;
 
 	$("#plot-button").click(function() {
@@ -208,12 +214,9 @@ UI.prototype.initPoints = function() {
 		)
 		context.data.addLine(v1, v2);
 		context.displayLine(v1, v2);
-		// context.data.center();
-		// context.displayLine(v1, v2, context.data.addLine(v1, v2, true));
 	});
 
 	$("#edit-points-button").click(function() {
-		console.log(context);
 		context.displayPoints();
 	});
 
@@ -222,6 +225,7 @@ UI.prototype.initPoints = function() {
 	});
 }
 
+// Reset all the lines and the "edit current lines" div
 UI.prototype.reset = function(lines) {
 	this.initializePointDisplay(lines);
 
@@ -244,11 +248,13 @@ UI.prototype.reset = function(lines) {
 	}
 }
 
+// Go to the "edit current lines" div
 UI.prototype.displayPoints = function() {
 	$(".gui-container").css("display", "none");
 	$("#points-edit").css("display", "block")
 }
 
+// Leave the "edit current lines" div and go back to the settings div
 UI.prototype.returnToSettings = function() {
 	$(".gui-container").css("display", "block")
 	$("#points-edit").css("display", "none");
@@ -279,6 +285,7 @@ UI.prototype.displayLine = function(v1, v2) {
 	$("#points-edit-containers").append(div);
 }
 
+// Remove a pointdisplay from the "edit current lines" div
 UI.prototype.removePointDisplay = function(div) {
 	var index = $("#points-edit-containers div").index(div);
 	div.remove();
@@ -289,6 +296,7 @@ UI.vectorToString = function(v) {
 	return ("<" + v.x + ", " + v.y + ", " + v.z + ", " + v.w + ">");
 }
 
+// initialize the "edit current lines" div with all the current lines
 UI.prototype.initializePointDisplay = function(lines) {
 	$("#points-edit-containers").empty();
 	for (var i = 0; i < lines.length; i++) {
